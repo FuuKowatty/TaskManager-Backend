@@ -39,4 +39,19 @@ public class TaskRepositoryTestImpl implements TaskRepository{
         return Optional.ofNullable(database.remove(id));
     }
 
+    @Override
+    public Task update(String id, Task newTask) {
+        Task task = Task
+                .builder()
+                .id(id)
+                .title(newTask.title())
+                .description(newTask.description())
+                .isCompleted(newTask.isCompleted())
+                .startDate(newTask.startDate())
+                .endDate(newTask.endDate())
+                .build();
+        database.replace(id, newTask);
+        return task;
+    }
+
 }
