@@ -1,10 +1,11 @@
 package pl.bartoszmech.domain.task;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 
 import java.time.*;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,12 +26,19 @@ public class TaskFacadeTest {
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusSeconds(1);
         //when
-        Task savedTask = taskFacade.createTask(title, description, endDate);
+        Task savedTask = taskFacade.createTask(CreateTaskRequestDto
+                        .builder()
+                        .title(title)
+                        .description(description)
+                        .endDate(endDate)
+                        .build()
+        );
         //then
         assertAll("Task assertions",
                 () -> assertThat(savedTask.title()).isEqualTo(title),
                 () -> assertThat(savedTask.description()).isEqualTo(description),
                 () -> assertThat(savedTask.isCompleted()).isEqualTo(false),
+                () -> assertThat(savedTask.id()).isNotNull(),
                 () -> assertTrue(endDate.isAfter(startDate))
         );
     }
@@ -45,12 +53,42 @@ public class TaskFacadeTest {
         //when
         Throwable endDateBeforeStartDate = assertThrows(
                 EndDateBeforeStartDateException.class,
-                () -> taskFacade.createTask(title, description, endDate)
+                () -> taskFacade.createTask(CreateTaskRequestDto
+                        .builder()
+                        .title(title)
+                        .description(description)
+                        .endDate(endDate)
+                        .build())
         );
         //then
         assertThat(endDateBeforeStartDate).isInstanceOf(EndDateBeforeStartDateException.class);
         assertThat(endDateBeforeStartDate.getMessage()).isEqualTo("Provided invalid dates order");
     }
 
+    @Test
+    public void should_success_return_empty_list_after_list_tasks() {
+        //when
+        List<Task> tasks = taskFacade.listTasks();
+        //then
+        assertThat(tasks).isEmpty();
+    }
 
+    @Test
+    public void should_success_return_list_of_added_tasks() {
+        //given
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
+        //when
+        Task savedTask = taskFacade.createTask(CreateTaskRequestDto
+                            .builder()
+                            .title(title)
+                            .description(description)
+                            .endDate(endDate)
+                            .build());
+        //when
+        List<Task> tasks = taskFacade.listTasks();
+        //then
+        assertThat(tasks.get(0)).isEqualTo(savedTask);
+    }
 }
