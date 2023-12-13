@@ -42,4 +42,11 @@ public class TaskFacade {
                 .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
         return TaskMapper.mapFromTask(foundTask);
     }
+
+    public TaskDto deleteById(String id) {
+        Task deletedTask = repository.deleteById(id)
+                .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
+        return TaskMapper.mapFromTask(deletedTask);
+    }
+
 }

@@ -34,4 +34,9 @@ public class TaskRepositoryTestImpl implements TaskRepository{
         return database.values().stream().filter(task -> task.id() == id).findFirst();
     }
 
+    @Override
+    public Optional<Task> deleteById(String id) {
+        return Optional.ofNullable(database.remove(id));
+    }
+
 }

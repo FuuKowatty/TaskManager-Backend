@@ -9,4 +9,6 @@ interface TaskRepository {
     List<Task> findAll();
 
     Optional<Task> findById(String id);
+
+    Optional<Task> deleteById(String id);
 }

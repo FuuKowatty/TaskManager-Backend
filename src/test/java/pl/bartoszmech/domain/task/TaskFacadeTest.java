@@ -120,4 +120,34 @@ public class TaskFacadeTest {
         assertThat(taskNotFound).isInstanceOf(ResourceNotFound.class);
         assertThat(taskNotFound.getMessage()).isEqualTo("Task with provided id could not be found");
     }
+
+    @Test
+    public void should_success_delete_task_by_id() {
+        //given
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
+                .builder()
+                .title(title)
+                .description(description)
+                .endDate(endDate)
+                .build());
+        //when
+        TaskDto deletedTask = taskFacade.deleteById(savedTask.id());
+        //then
+        assertThat(deletedTask).isEqualTo(savedTask);
+        assertThat(taskFacade.listTasks()).isEmpty();
+    }
+
+    @Test
+    public void should_throw_not_found_exception_when_client_provide_invalid_id_in_deleteById() {
+        //given
+        String id = "NotExistingID";
+        //when
+        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.deleteById(id));
+        //then
+        assertThat(taskNotFound).isInstanceOf(ResourceNotFound.class);
+        assertThat(taskNotFound.getMessage()).isEqualTo("Task with provided id could not be found");
+    }
 }
