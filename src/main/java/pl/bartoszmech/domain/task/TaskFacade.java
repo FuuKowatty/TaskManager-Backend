@@ -11,63 +11,31 @@ import java.util.List;
 
 @AllArgsConstructor
 public class TaskFacade {
-    private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
-    private final TaskRepository repository;
+    private final TaskService taskService;
     private final Clock clock;
-    private  static String INVALID_DATE_ORDER = "Provided invalid dates order";
+
     public TaskDto createTask(CreateTaskRequestDto taskRequestDto) {
         LocalDateTime startDate = LocalDateTime.now(clock);
-        LocalDateTime endDate = taskRequestDto.endDate();
-        if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
-            throw new EndDateBeforeStartDateException(INVALID_DATE_ORDER);
-        }
-        Task savedTask = repository.save(Task.builder()
-                        .title(taskRequestDto.title())
-                        .description(taskRequestDto.description())
-                        .startDate(startDate)
-                        .endDate(endDate)
-                        .build());
-        return TaskMapper.mapFromTask(savedTask);
+        taskService.checkIfStartDateIfBeforeEndDate(startDate, taskRequestDto.endDate());
+        return taskService.createTask(taskRequestDto, startDate);
     }
 
     public List<TaskDto> listTasks() {
-        return repository
-                .findAll()
-                .stream()
-                .map(task -> TaskMapper.mapFromTask(task))
-                .toList();
+        return taskService.listTasks();
     }
 
     public TaskDto findById(String id) {
-        Task foundTask = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
-        return TaskMapper.mapFromTask(foundTask);
+        return taskService.findById(id);
     }
 
     public TaskDto deleteById(String id) {
-        Task deletedTask = repository.deleteById(id)
-                .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
-        return TaskMapper.mapFromTask(deletedTask);
+        return taskService.deleteById(id);
     }
 
     public TaskDto updateTask(String id, UpdateTaskRequestDto taskRequestDto) {
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = taskRequestDto.endDate();
-        if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
-            throw new EndDateBeforeStartDateException(INVALID_DATE_ORDER);
-        }
-
-        Task newTask = Task.builder()
-                .title(taskRequestDto.title())
-                .description(taskRequestDto.description())
-                .isCompleted(taskRequestDto.isCompleted())
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
-
-        Task foundTask = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
-
-        return TaskMapper.mapFromTask(repository.update(foundTask.id(), newTask));
+        taskService.checkIfStartDateIfBeforeEndDate(startDate, endDate);
+        return taskService.updateTask(id, taskRequestDto, startDate);
     }
 }

@@ -1,9 +1,10 @@
 package pl.bartoszmech.domain.task;
 
+import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 
-public class TaskMapper {
-    public static TaskDto mapFromTask(Task savedTask) {
+class TaskMapper {
+    static TaskDto mapFromTask(Task savedTask) {
         return TaskDto
                 .builder()
                 .id(savedTask.id())
