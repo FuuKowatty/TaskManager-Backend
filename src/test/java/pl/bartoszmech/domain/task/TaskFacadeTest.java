@@ -19,7 +19,7 @@ public class TaskFacadeTest {
             LocalDateTime.of(2014, 12, 22, 10, 15, 30).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
     );
-    TaskFacade taskFacade = new TaskFacade(new TaskRepositoryTestImpl(), clock);
+    TaskFacade taskFacade = new TaskFacade(new TaskService(new TaskRepositoryTestImpl()), clock);
 
     @Test
     public void should_successfully_create_task() {
