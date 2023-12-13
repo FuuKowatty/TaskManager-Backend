@@ -1,6 +1,7 @@
 package pl.bartoszmech.domain.task;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,6 +27,11 @@ public class TaskRepositoryTestImpl implements TaskRepository{
     @Override
     public List<Task> findAll() {
         return database.values().stream().toList();
+    }
+
+    @Override
+    public Optional<Task> findById(String id) {
+        return database.values().stream().filter(task -> task.id() == id).findFirst();
     }
 
 }
