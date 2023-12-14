@@ -2,6 +2,7 @@ package pl.bartoszmech.domain.task;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import pl.bartoszmech.domain.shared.ResourceNotFound;
 import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
