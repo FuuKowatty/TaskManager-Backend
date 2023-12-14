@@ -11,9 +11,11 @@ import java.util.List;
 
 @AllArgsConstructor
 class TaskService {
-    private final TaskRepository repository;
+    private static final String TASK_DUPLICATE = "Provided task is already assigned to this same user";
     private  static String INVALID_DATE_ORDER = "Provided invalid dates order";
     private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
+
+    private final TaskRepository repository;
 
     TaskDto createTask(CreateTaskRequestDto task, LocalDateTime startDate) {
         Task savedTask = repository.save(Task.builder()
@@ -63,5 +65,17 @@ class TaskService {
                 .build();
         TaskDto foundTask = findById(id);
         return TaskMapper.mapFromTask(repository.update(foundTask.id(), newTask));
+    }
+
+    public void checkIfUserHaveAlreadyThisTask(CreateTaskRequestDto inputTask) {
+        if(isTaskAssignedToSameUser(inputTask)) {
+            throw new DuplicateUserTaskException(TASK_DUPLICATE);
+        }
+    }
+
+    private boolean isTaskAssignedToSameUser(CreateTaskRequestDto inputTask) {
+        return listTasks().stream()
+                .anyMatch(task -> task.title().equals(inputTask.title()) &&
+                        task.assignedTo().equals(inputTask.assignedTo()));
     }
 }

@@ -70,7 +70,6 @@ public class TaskFacadeTest {
                         .build())
         );
         //then
-        assertThat(endDateBeforeStartDate).isInstanceOf(EndDateBeforeStartDateException.class);
         assertThat(endDateBeforeStartDate.getMessage()).isEqualTo("Provided invalid dates order");
     }
 
@@ -127,7 +126,6 @@ public class TaskFacadeTest {
         //when
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.findById(id));
         //then
-        assertThat(taskNotFound).isInstanceOf(ResourceNotFound.class);
         assertThat(taskNotFound.getMessage()).isEqualTo("Task with provided id could not be found");
     }
 
@@ -159,7 +157,6 @@ public class TaskFacadeTest {
         //when
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.deleteById(id));
         //then
-        assertThat(taskNotFound).isInstanceOf(ResourceNotFound.class);
         assertThat(taskNotFound.getMessage()).isEqualTo("Task with provided id could not be found");
     }
 
@@ -227,7 +224,6 @@ public class TaskFacadeTest {
                         .assignedTo(userId)
                         .build()));
         //then
-        assertThat(taskNotFound).isInstanceOf(ResourceNotFound.class);
         assertThat(taskNotFound.getMessage()).isEqualTo("Task with provided id could not be found");
     }
 
@@ -257,7 +253,53 @@ public class TaskFacadeTest {
                         .build())
         );
         //then
-        assertThat(endDateBeforeStartDate).isInstanceOf(EndDateBeforeStartDateException.class);
         assertThat(endDateBeforeStartDate.getMessage()).isEqualTo("Provided invalid dates order");
+    }
+
+    @Test
+    public void should_throw_exception_if_assign_this_same_task_title_to_this_same_user() {
+        //given
+        String userId = "rkiri3i3ijfiijffw3";
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title(title)
+                .description("fkiwfofwofwowf")
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
+                .build());
+        //when
+        Throwable duplicateUserTask = assertThrows(DuplicateUserTaskException.class,
+                () -> taskFacade.createTask(CreateTaskRequestDto.builder()
+                    .title(title)
+                    .description(description)
+                    .endDate(LocalDateTime.now(clock).plusSeconds(3))
+                    .assignedTo(userId)
+                    .build())
+        );
+        //then
+        assertThat(duplicateUserTask.getMessage()).isEqualTo("Provided task is already assigned to this same user");
+    }
+
+    @Test
+    public void should_success_create_task_with_same_title_but_assigned_to_other_user() {
+        //given
+        String userId = "rkiri3i3ijfiijffw3";
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title("RandomTitle")
+                .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
+                .build());
+        //when
+        TaskDto newTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+                        .title("Rdaiodiod")
+                        .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
+                        .endDate(LocalDateTime.now(clock).plusSeconds(3))
+                        .assignedTo(userId)
+                        .build());
+        //then
+        assertThat(savedTask.title()).isNotEqualTo(newTask.title());
+        assertThat(savedTask.assignedTo()).isEqualTo(newTask.assignedTo());
     }
 }

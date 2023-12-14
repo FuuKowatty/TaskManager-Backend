@@ -17,6 +17,7 @@ public class TaskFacade {
     public TaskDto createTask(CreateTaskRequestDto taskRequestDto) {
         LocalDateTime startDate = LocalDateTime.now(clock);
         taskService.checkIfStartDateIfBeforeEndDate(startDate, taskRequestDto.endDate());
+        taskService.checkIfUserHaveAlreadyThisTask(taskRequestDto);
         return taskService.createTask(taskRequestDto, startDate);
     }
 
