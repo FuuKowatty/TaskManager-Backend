@@ -50,7 +50,7 @@ public class TaskRepositoryTestImpl implements TaskRepository{
                 .startDate(newTask.startDate())
                 .endDate(newTask.endDate())
                 .build();
-        database.replace(id, newTask);
+        database.replace(id, task);
         return task;
     }
 
