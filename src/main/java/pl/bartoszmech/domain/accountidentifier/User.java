@@ -3,7 +3,7 @@ package pl.bartoszmech.domain.accountidentifier;
 import lombok.Builder;
 
 @Builder
-public record User(
+record User(
         String id,
         String firstName,
         String lastName,

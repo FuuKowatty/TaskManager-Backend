@@ -28,7 +28,7 @@ class UserService {
     }
 
 
-    public List<UserDto> listUsers() {
+    List<UserDto> listUsers() {
         return repository
                 .findAll()
                 .stream()
@@ -36,19 +36,19 @@ class UserService {
                 .toList();
     }
 
-    public UserDto findById(String id) {
+    UserDto findById(String id) {
         User foundUser = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
         return UserMapper.mapFromUser(foundUser);
     }
 
-    public UserDto deleteById(String id) {
+    UserDto deleteById(String id) {
         User deletedUser = repository.deleteById(id)
                 .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
         return UserMapper.mapFromUser(deletedUser);
     }
 
-    public UserDto updateUser(String id, UpdateUserRequestDto inputUser) {
+    UserDto updateUser(String id, UpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
         User newUser = User.builder()
                 .firstName(inputUser.firstName())

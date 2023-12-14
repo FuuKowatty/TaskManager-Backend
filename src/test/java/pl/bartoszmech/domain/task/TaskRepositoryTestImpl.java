@@ -19,6 +19,7 @@ public class TaskRepositoryTestImpl implements TaskRepository{
                 .isCompleted(false)
                 .startDate(entity.startDate())
                 .endDate(entity.endDate())
+                .assignedTo(entity.assignedTo())
                 .build();
         database.put(id, task);
         return task;
@@ -49,6 +50,7 @@ public class TaskRepositoryTestImpl implements TaskRepository{
                 .isCompleted(newTask.isCompleted())
                 .startDate(newTask.startDate())
                 .endDate(newTask.endDate())
+                .assignedTo(newTask.assignedTo())
                 .build();
         database.replace(id, task);
         return task;

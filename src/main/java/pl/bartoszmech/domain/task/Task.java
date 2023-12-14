@@ -12,7 +12,8 @@ record Task(
         String description,
         boolean isCompleted,
         LocalDateTime startDate,
-        LocalDateTime endDate
+        LocalDateTime endDate,
+        String assignedTo
 ) {
     @Override
     public boolean equals(Object o) {

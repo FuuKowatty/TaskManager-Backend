@@ -13,6 +13,7 @@ class TaskMapper {
                 .isCompleted(savedTask.isCompleted())
                 .startDate(savedTask.startDate())
                 .endDate(savedTask.endDate())
+                .assignedTo(savedTask.assignedTo())
                 .build();
     }
 }

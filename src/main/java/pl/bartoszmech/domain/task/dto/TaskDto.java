@@ -11,6 +11,7 @@ public record TaskDto(
         String description,
         boolean isCompleted,
         LocalDateTime startDate,
-        LocalDateTime endDate
+        LocalDateTime endDate,
+        String assignedTo
 ) {
 }

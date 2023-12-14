@@ -25,6 +25,7 @@ public class TaskFacadeTest {
     @Test
     public void should_successfully_create_task() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
@@ -35,6 +36,7 @@ public class TaskFacadeTest {
                         .title(title)
                         .description(description)
                         .endDate(endDate)
+                        .assignedTo(userId)
                         .build()
         );
         //then
@@ -43,13 +45,15 @@ public class TaskFacadeTest {
                 () -> assertThat(savedTask.description()).isEqualTo(description),
                 () -> assertThat(savedTask.isCompleted()).isEqualTo(false),
                 () -> assertThat(savedTask.id()).isNotNull(),
-                () -> assertTrue(endDate.isAfter(startDate))
+                () -> assertTrue(endDate.isAfter(startDate)),
+                () -> assertThat(savedTask.assignedTo()).isEqualTo(userId)
         );
     }
 
     @Test
     public void should_throw_exception_if_endDate_isBefore_startDate_in_createTask() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
@@ -62,6 +66,7 @@ public class TaskFacadeTest {
                         .title(title)
                         .description(description)
                         .endDate(endDate)
+                        .assignedTo(userId)
                         .build())
         );
         //then
@@ -80,14 +85,15 @@ public class TaskFacadeTest {
     @Test
     public void should_success_return_list_of_added_tasks() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
-                            .builder()
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
                             .title(title)
                             .description(description)
                             .endDate(endDate)
+                            .assignedTo(userId)
                             .build());
         //when
         List<TaskDto> tasks = taskFacade.listTasks();
@@ -98,14 +104,15 @@ public class TaskFacadeTest {
     @Test
     public void should_find_task_by_id() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
-                .builder()
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
                 .title(title)
                 .description(description)
                 .endDate(endDate)
+                .assignedTo(userId)
                 .build());
         //when
         TaskDto foundTask = taskFacade.findById(savedTask.id());
@@ -127,6 +134,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_delete_task_by_id() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
@@ -135,6 +143,7 @@ public class TaskFacadeTest {
                 .title(title)
                 .description(description)
                 .endDate(endDate)
+                .assignedTo(userId)
                 .build());
         //when
         TaskDto deletedTask = taskFacade.deleteById(savedTask.id());
@@ -157,6 +166,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_update_task() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         boolean isCompleted = true;
@@ -167,6 +177,7 @@ public class TaskFacadeTest {
                 .title("dododod")
                 .description("fkiwfofwofwowf")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
                 .build());
         //when
         TaskDto updatedTask = taskFacade.updateTask(savedTask.id(), UpdateTaskRequestDto.builder()
@@ -174,12 +185,14 @@ public class TaskFacadeTest {
                         .description(description)
                         .isCompleted(isCompleted)
                         .endDate(endDate)
+                        .assignedTo(userId)
                         .build());
         //then
         assertAll("Update task assertions",
                 () -> assertThat(updatedTask.title()).isEqualTo(title),
                 () -> assertThat(updatedTask.description()).isEqualTo(description),
                 () -> assertThat(updatedTask.isCompleted()).isEqualTo(isCompleted),
+                () -> assertThat(updatedTask.assignedTo()).isEqualTo(userId),
                 () -> assertThat(updatedTask.id()).isNotNull(),
                 () -> assertThat(updatedTask.id()).isEqualTo(savedTask.id()),
                 () -> assertThat(updatedTask.endDate()).isNotEqualTo(savedTask.endDate()),
@@ -191,6 +204,7 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_if_client_provide_invalid_id_in_updateTask() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         boolean isCompleted = true;
@@ -202,6 +216,7 @@ public class TaskFacadeTest {
                 .title("dododod")
                 .description("fkiwfofwofwowf")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
                 .build());
         //when
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.updateTask(id, UpdateTaskRequestDto.builder()
@@ -209,6 +224,7 @@ public class TaskFacadeTest {
                         .description(description)
                         .isCompleted(isCompleted)
                         .endDate(endDate)
+                        .assignedTo(userId)
                         .build()));
         //then
         assertThat(taskNotFound).isInstanceOf(ResourceNotFound.class);
@@ -218,15 +234,16 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_if_endDate_isBefore_startDate_in_updateTask() {
         //given
+        String userId = "rkiri3i3ijfiijffw3";
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.minusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
-                .builder()
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
                 .title("dododod")
                 .description("fkiwfofwofwowf")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
                 .build());
         //when
         Throwable endDateBeforeStartDate = assertThrows(

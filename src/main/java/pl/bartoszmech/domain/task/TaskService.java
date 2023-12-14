@@ -21,6 +21,7 @@ class TaskService {
                 .description(task.description())
                 .startDate(startDate)
                 .endDate(task.endDate())
+                .assignedTo(task.assignedTo())
                 .build());
         return TaskMapper.mapFromTask(savedTask);
     }
@@ -58,6 +59,7 @@ class TaskService {
                 .isCompleted(taskRequestDto.isCompleted())
                 .startDate(startDate)
                 .endDate(taskRequestDto.endDate())
+                .assignedTo(taskRequestDto.assignedTo())
                 .build();
         TaskDto foundTask = findById(id);
         return TaskMapper.mapFromTask(repository.update(foundTask.id(), newTask));
