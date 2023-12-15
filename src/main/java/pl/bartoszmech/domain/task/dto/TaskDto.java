@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 
 @Builder
 public record TaskDto(
-        String id,
+        Long id,
         String title,
         String description,
         boolean isCompleted,
         LocalDateTime startDate,
         LocalDateTime endDate,
-        String assignedTo
+        Long assignedTo
 ) {
 }

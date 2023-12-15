@@ -10,6 +10,6 @@ public record UpdateTaskRequestDto(
         String description,
         boolean isCompleted,
         LocalDateTime endDate,
-        String assignedTo
+        Long assignedTo
 ) {
 }
