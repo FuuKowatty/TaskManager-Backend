@@ -13,11 +13,15 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.Clock;
+
 @SpringBootTest(classes = TaskManager.class)
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 @Testcontainers
 public class BaseIntegrationTest {
+    @Autowired
+    public Clock adjustableClock;
     @Autowired
     public MockMvc mockMvc;
     @Autowired
