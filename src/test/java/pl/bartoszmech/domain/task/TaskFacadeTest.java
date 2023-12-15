@@ -25,7 +25,7 @@ public class TaskFacadeTest {
     @Test
     public void should_successfully_create_task() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
@@ -53,7 +53,7 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_if_endDate_isBefore_startDate_in_createTask() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
@@ -84,7 +84,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_return_list_of_added_tasks() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
@@ -103,7 +103,7 @@ public class TaskFacadeTest {
     @Test
     public void should_find_task_by_id() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 999L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
@@ -122,7 +122,7 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_when_provided_invalid_id_in_findById() {
         //given
-        String id = "NotExistingID";
+        long id = 999L;
         //when
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.findById(id));
         //then
@@ -132,7 +132,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_delete_task_by_id() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
@@ -153,7 +153,7 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_not_found_exception_when_client_provide_invalid_id_in_deleteById() {
         //given
-        String id = "NotExistingID";
+        long id = 9999L;
         //when
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.deleteById(id));
         //then
@@ -163,7 +163,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_update_task() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         boolean isCompleted = true;
@@ -201,13 +201,13 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_if_client_provide_invalid_id_in_updateTask() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         boolean isCompleted = true;
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusDays(1);
-        String id = "NonExistingId";
+        long id = 997L;
         TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
                 .builder()
                 .title("dododod")
@@ -230,7 +230,7 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_if_endDate_isBefore_startDate_in_updateTask() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
@@ -259,7 +259,7 @@ public class TaskFacadeTest {
     @Test
     public void should_throw_exception_if_assign_this_same_task_title_to_this_same_user() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         taskFacade.createTask(CreateTaskRequestDto.builder()
@@ -284,7 +284,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_create_task_with_same_title_but_assigned_to_other_user() {
         //given
-        String userId = "rkiri3i3ijfiijffw3";
+        long userId = 997L;
         TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
                 .title("RandomTitle")
                 .description("dnjfouwfofw2r21  rr 32r r32 r2 3")

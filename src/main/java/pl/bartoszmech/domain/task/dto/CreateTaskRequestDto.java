@@ -9,6 +9,6 @@ public record CreateTaskRequestDto(
         String title,
         String description,
         LocalDateTime endDate,
-        String assignedTo
+        Long assignedTo
 ) {
 }

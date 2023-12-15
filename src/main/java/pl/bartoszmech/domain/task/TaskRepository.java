@@ -1,16 +1,10 @@
 package pl.bartoszmech.domain.task;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
-interface TaskRepository {
-    Task save(Task task);
-
-    List<Task> findAll();
-
-    Optional<Task> findById(String id);
-
-    Optional<Task> deleteById(String id);
-
-    Task update(String id, Task newTask);
+@Repository
+interface TaskRepository extends JpaRepository<Task, Long> {
 }
