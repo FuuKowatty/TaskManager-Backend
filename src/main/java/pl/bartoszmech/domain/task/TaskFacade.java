@@ -25,15 +25,15 @@ public class TaskFacade {
         return taskService.listTasks();
     }
 
-    public TaskDto findById(String id) {
+    public TaskDto findById(Long id) {
         return taskService.findById(id);
     }
 
-    public TaskDto deleteById(String id) {
+    public TaskDto deleteById(Long id) {
         return taskService.deleteById(id);
     }
 
-    public TaskDto updateTask(String id, UpdateTaskRequestDto taskRequestDto) {
+    public TaskDto updateTask(Long id, UpdateTaskRequestDto taskRequestDto) {
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = taskRequestDto.endDate();
         taskService.checkIfStartDateIfBeforeEndDate(startDate, endDate);
