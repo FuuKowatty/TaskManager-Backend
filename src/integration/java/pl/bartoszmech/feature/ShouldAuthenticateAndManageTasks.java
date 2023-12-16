@@ -1,11 +1,14 @@
 package pl.bartoszmech.feature;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.core.type.TypeReference;
 import pl.bartoszmech.BaseIntegrationTest;
+import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
 import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 
@@ -19,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
 @Log4j2
 public class ShouldAuthenticateAndManageTasks extends BaseIntegrationTest {
     @Test
@@ -31,7 +34,7 @@ public class ShouldAuthenticateAndManageTasks extends BaseIntegrationTest {
 //          Step 3: Log in.
 //          Step 4: View a list of tasks (expecting an empty list).
 //          Step 5: Create a task.
-            CreateTaskRequestDto req = CreateTaskRequestDto.builder()
+            CreateTaskRequestDto taskApiBody = CreateTaskRequestDto.builder()
                     .title("Mdfiqwi")
                     .description("2ff2f 2f 2f")
                     .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
@@ -39,7 +42,7 @@ public class ShouldAuthenticateAndManageTasks extends BaseIntegrationTest {
                     .build();
             //given&when
             MvcResult createdTaskResponse = mockMvc.perform(post("/api/tasks")
-                            .content(objectMapper.writeValueAsString(req))
+                            .content(objectMapper.writeValueAsString(taskApiBody))
                             .contentType(APPLICATION_JSON_VALUE))
             //then
                     .andExpect(status().isCreated())
@@ -83,7 +86,47 @@ public class ShouldAuthenticateAndManageTasks extends BaseIntegrationTest {
 
             List<TaskDto> taskListAfterDeleteTask = objectMapper.readValue(taskListAfterDeleteTaskResponse.getResponse().getContentAsString(), new TypeReference<>() {});
             assertThat(taskListAfterDeleteTask).isEmpty();
+//        step 10 create user
+            CreateUserRequestDto userApiBody = CreateUserRequestDto.builder()
+                    .firstName("Dany")
+                    .lastName("Abramov")
+                    .email("example@gmail.com")
+                    .password("zaq1@WSX")
+                    .role(ADMIN)
+                    .build();
+            MvcResult createdUserResponse = mockMvc.perform(post("/api/users")
+                            .content(objectMapper.writeValueAsString(userApiBody))
+                            .contentType(APPLICATION_JSON_VALUE))
+                    //then
+                    .andExpect(status().isCreated())
+                    .andReturn();
+            UserDto createdUser = objectMapper.readValue(createdTaskResponse.getResponse().getContentAsString(), new TypeReference<>() {});
+            //step 11 get user by id
+            long id = createdUser.id();
+            MvcResult userGetByIdResponse = mockMvc.perform(get("/api/users/" + id)
+                            .contentType(APPLICATION_JSON_VALUE))
+                    //then
+                    .andExpect(status().isOk())
+                    .andReturn();
+            UserDto getByIdUser = objectMapper.readValue(createdTaskResponse.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertThat(createdUser).isEqualTo(getByIdUser);
+            //step  12 delete user
+            MvcResult deleteUserResponse = mockMvc.perform(delete("/api/users/" + id)
+                            .contentType(APPLICATION_JSON_VALUE))
+                    //then
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            //step 13 list users
+            MvcResult userListResponse = mockMvc.perform(get("/api/users")
+                            .contentType(APPLICATION_JSON_VALUE))
+                    //then
+                    .andExpect(status().isOk())
+                    .andReturn();
+            List<UserDto> userList = objectMapper.readValue(userListResponse.getResponse().getContentAsString(), new TypeReference<>() {});
+
 //        Step 7: Test endpoints to validate filters.
+
 //        Step 8: An employee attempts to create a user/task and receives an error.
 //        Step 9: A manager attempts to create a user and receives an error.
 //                Step 10: An employee displays only their tasks and receives a valid response.

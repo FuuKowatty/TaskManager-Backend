@@ -1,6 +1,7 @@
 package pl.bartoszmech.domain.accountidentifier;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
@@ -9,6 +10,7 @@ import pl.bartoszmech.domain.shared.ResourceNotFound;
 import java.util.List;
 
 @AllArgsConstructor
+@Service
 class UserService {
     private static final String EMAIL_TAKEN = "User email is taken";
     private static final String USER_NOT_FOUND = "User with provided id could not be found";
