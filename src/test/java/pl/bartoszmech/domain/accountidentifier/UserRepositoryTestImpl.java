@@ -1,26 +1,58 @@
 package pl.bartoszmech.domain.accountidentifier;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class UserRepositoryTestImpl implements UserRepository {
-    ConcurrentHashMap<String, User> database = new ConcurrentHashMap<>();
+    ConcurrentHashMap<Long, User> database = new ConcurrentHashMap<>();
 
     @Override
     public User save(User newUser) {
-        String id = UUID.randomUUID().toString();
-        User user = User.builder()
-                .id(id)
-                .firstName(newUser.firstName())
-                .lastName(newUser.lastName())
-                .email(newUser.email())
-                .password(newUser.password())
-                .role(newUser.role())
-                .build();
-        database.put(id, user);
+        if(newUser.getId() == null) {
+            Random random = new Random();
+            long id = random.nextLong();
+            User user = new User(
+                    id,
+                    newUser.getFirstName(),
+                    newUser.getLastName(),
+                    newUser.getEmail(),
+                    newUser.getPassword(),
+                    newUser.getRole()
+            );
+            database.put(id, user);
+            return user;
+        }
+        long id = newUser.getId();
+        User user = new User(
+                id,
+                newUser.getFirstName(),
+                newUser.getLastName(),
+                newUser.getEmail(),
+                newUser.getPassword(),
+                newUser.getRole()
+        );
+        database.replace(id, user);
         return user;
+    }
+
+    @Override
+    public <S extends User> List<S> saveAll(Iterable<S> entities) {
+        return null;
+    }
+
+    @Override
+    public boolean existsById(Long aLong) {
+        return false;
     }
 
     @Override
@@ -29,32 +61,138 @@ public class UserRepositoryTestImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(String id) {
-        return database.values().stream().filter(task -> task.id() == id).findFirst();
+    public List<User> findAllById(Iterable<Long> longs) {
+        return null;
     }
 
     @Override
-    public Optional<User> deleteById(String id) {
-        return Optional.ofNullable(database.remove(id));
+    public long count() {
+        return 0;
     }
 
     @Override
-    public User update(String id, User newUser) {
-        User user = User.builder()
-                .id(id)
-                .firstName(newUser.firstName())
-                .lastName(newUser.lastName())
-                .email(newUser.email())
-                .password(newUser.password())
-                .role(newUser.role())
-                .build();
-        database.replace(id, user);
-        return user;
+    public void delete(User entity) {
+
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> longs) {
+
+    }
+
+    @Override
+    public void deleteAll(Iterable<? extends User> entities) {
+
+    }
+
+    @Override
+    public void deleteAll() {
+
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return database.values().stream().filter(task -> task.getId().equals(id)).findFirst();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        database.remove(id);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return !database.values().stream().filter(user -> user.email() == email).toList().isEmpty();
+        return !database.values().stream().filter(user -> user.getEmail().equals(email)).toList().isEmpty();
+    }
+
+    @Override
+    public void flush() {
+
+    }
+
+    @Override
+    public <S extends User> S saveAndFlush(S entity) {
+        return null;
+    }
+
+    @Override
+    public <S extends User> List<S> saveAllAndFlush(Iterable<S> entities) {
+        return null;
+    }
+
+    @Override
+    public void deleteAllInBatch(Iterable<User> entities) {
+
+    }
+
+    @Override
+    public void deleteAllByIdInBatch(Iterable<Long> longs) {
+
+    }
+
+    @Override
+    public void deleteAllInBatch() {
+
+    }
+
+    @Override
+    public User getOne(Long aLong) {
+        return null;
+    }
+
+    @Override
+    public User getById(Long aLong) {
+        return null;
+    }
+
+    @Override
+    public User getReferenceById(Long aLong) {
+        return null;
+    }
+
+    @Override
+    public <S extends User> Optional<S> findOne(Example<S> example) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <S extends User> List<S> findAll(Example<S> example) {
+        return null;
+    }
+
+    @Override
+    public <S extends User> List<S> findAll(Example<S> example, Sort sort) {
+        return null;
+    }
+
+    @Override
+    public <S extends User> Page<S> findAll(Example<S> example, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public <S extends User> long count(Example<S> example) {
+        return 0;
+    }
+
+    @Override
+    public <S extends User> boolean exists(Example<S> example) {
+        return false;
+    }
+
+    @Override
+    public <S extends User, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+        return null;
+    }
+
+    @Override
+    public List<User> findAll(Sort sort) {
+        return null;
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        return null;
     }
 }
 

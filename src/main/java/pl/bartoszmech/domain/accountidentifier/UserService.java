@@ -5,7 +5,6 @@ import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
-import pl.bartoszmech.domain.task.dto.TaskDto;
 
 import java.util.List;
 
@@ -17,13 +16,13 @@ class UserService {
     private final UserRepository repository;
 
     UserDto createUser(CreateUserRequestDto inputUser) {
-        User savedUser = repository.save(User.builder()
-                .firstName(inputUser.firstName())
-                .lastName(inputUser.lastName())
-                .email(inputUser.email())
-                .password(inputUser.password())
-                .role(inputUser.role())
-                .build());
+        User savedUser = repository.save(new User(
+                    inputUser.firstName(),
+                    inputUser.lastName(),
+                    inputUser.email(),
+                    inputUser.password(),
+                    inputUser.role()
+                ));
         return UserMapper.mapFromUser(savedUser);
     }
 
@@ -32,36 +31,36 @@ class UserService {
         return repository
                 .findAll()
                 .stream()
-                .map(user -> UserMapper.mapFromUser(user))
+                .map(UserMapper::mapFromUser)
                 .toList();
     }
 
-    UserDto findById(String id) {
+    UserDto findById(Long id) {
         User foundUser = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
         return UserMapper.mapFromUser(foundUser);
     }
 
-    UserDto deleteById(String id) {
-        User deletedUser = repository.deleteById(id)
-                .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
-        return UserMapper.mapFromUser(deletedUser);
+    UserDto deleteById(Long id) {
+        UserDto deletedUser = findById(id);
+        repository.deleteById(id);
+        return deletedUser;
     }
 
-    UserDto updateUser(String id, UpdateUserRequestDto inputUser) {
+    UserDto updateUser(Long id, UpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
-        User newUser = User.builder()
-                .firstName(inputUser.firstName())
-                .lastName(inputUser.lastName())
-                .email(inputUser.email())
-                .password(inputUser.password())
-                .role(inputUser.role())
-                .build();
-        return UserMapper.mapFromUser(repository.update(id, newUser));
+        return UserMapper.mapFromUser(repository.save(new User(
+                id,
+                inputUser.firstName(),
+                inputUser.lastName(),
+                inputUser.email(),
+                inputUser.password(),
+                inputUser.role()
+        )));
     }
 
-    void checkIfEmailIsAlreadyUsedByOtherUser(String id, UpdateUserRequestDto userRequestDto) {
-        if(findById(id).email() != userRequestDto.email() && repository.existsByEmail(userRequestDto.email())) {
+    void checkIfEmailIsAlreadyUsedByOtherUser(Long id, UpdateUserRequestDto userRequestDto) {
+        if(!findById(id).email().equals(userRequestDto.email())  && repository.existsByEmail(userRequestDto.email())) {
             throw new EmailTakenException(EMAIL_TAKEN);
         }
     }

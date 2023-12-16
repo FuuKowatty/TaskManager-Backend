@@ -1,20 +1,10 @@
 package pl.bartoszmech.domain.accountidentifier;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
-import pl.bartoszmech.domain.task.EndDateBeforeStartDateException;
-import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
-import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,20 +46,15 @@ public class AccountIdentifierFacadeTest {
     @Test
     public void should_throw_exception_if_email_is_already_used() {
         //given
-        String firstName = "Dany";
-        String lastName = "Abramov";
         String email = "example@gmail.com";
-        String password = "zaq1@WSX";
-        UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
-                .builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .password(password)
-                .role(role)
-                .build()
-        );
+        accountIdentifierFacade.createUser(CreateUserRequestDto
+                        .builder()
+                        .firstName("Dany")
+                        .lastName("Abramov")
+                        .email(email)
+                        .password("zaq1@WSX")
+                        .role(EMPLOYEE)
+                        .build());
         //when
         Throwable emailTaken = assertThrows(
                 EmailTakenException.class,
@@ -143,7 +128,7 @@ public class AccountIdentifierFacadeTest {
     @Test
     public void should_throw_exception_when_provided_invalid_id_in_findById() {
         //given
-        String id = "NotExistingID";
+        Long id = 997L;
         //when
         Throwable userNotFound = assertThrows(ResourceNotFound.class, () -> accountIdentifierFacade.findById(id));
         //then
@@ -178,7 +163,7 @@ public class AccountIdentifierFacadeTest {
     @Test
     public void should_throw_not_found_exception_when_client_provide_invalid_id_in_deleteById() {
         //given
-        String id = "NotExistingID";
+        long id = 997L;
         //when
         Throwable userNotFound = assertThrows(ResourceNotFound.class, () -> accountIdentifierFacade.deleteById(id));
         //then
@@ -216,30 +201,18 @@ public class AccountIdentifierFacadeTest {
                 () -> assertThat(updatedUser.firstName()).isEqualTo(firstName),
                 () -> assertThat(updatedUser.lastName()).isEqualTo(lastName),
                 () -> assertThat(updatedUser.email()).isEqualTo(email),
-                () -> assertThat(updatedUser.role()).isEqualTo(role),
+                () -> assertThat(updatedUser.role()).isEqualTo(savedUser.role()),
                 () -> assertThat(updatedUser.id()).isNotNull(),
-                () -> assertThat(updatedUser.id()).isEqualTo(updatedUser.id())
+                () -> assertThat(updatedUser.id()).isEqualTo(savedUser.id())
         );
     }
 
     @Test
     public void should_throw_exception_if_client_provide_invalid_id_in_updateUser() {
         //given
-        String id = "nonExistingId";
-        String firstName = "Dany";
-        String lastName = "Abramov";
-        String email = "example@gmail.com";
+        long id = 997L;
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
-                .builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .password(password)
-                .role(role)
-                .build()
-        );
         //when
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> accountIdentifierFacade.updateUser(id, UpdateUserRequestDto.builder()
                 .firstName("OtherNameThanDany")

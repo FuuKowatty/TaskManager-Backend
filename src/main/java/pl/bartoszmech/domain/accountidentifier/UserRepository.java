@@ -1,18 +1,12 @@
 package pl.bartoszmech.domain.accountidentifier;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
-interface UserRepository {
-    User save(User user);
-
-    List<User> findAll();
-
-    Optional<User> findById(String id);
-
-    Optional<User> deleteById(String id);
-
-    User update(String id, User newUser);
-
+@Repository
+interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 }
