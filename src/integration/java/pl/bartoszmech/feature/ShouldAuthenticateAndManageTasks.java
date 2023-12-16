@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,15 +58,31 @@ public class ShouldAuthenticateAndManageTasks extends BaseIntegrationTest {
             TaskDto createdTaskButFromList = taskListAfterGetUnauthorized.get(0);
             assertThat(taskListAfterGetUnauthorized.size()).isEqualTo(1);
             assertThat(createdTaskButFromList).isEqualTo(createdTask);
-//            assertAll("Task Properties",
-//                    () -> assertThat(createdTaskButFromList.id()).isEqualTo(createdTask.id()),
-//                    () -> assertThat(createdTaskButFromList.title()).isEqualTo(createdTask.title()),
-//                    () -> assertThat(createdTaskButFromList.description()).isEqualTo(createdTask.description()),
-//                    () -> assertThat(createdTaskButFromList.isCompleted()).isEqualTo(createdTask.isCompleted()),
-//                    () -> assertThat(createdTaskButFromList.startDate()).isEqualTo(createdTask.startDate()),
-//                    () -> assertThat(createdTaskButFromList.endDate()).isEqualTo(createdTask.endDate()),
-//                    () -> assertThat(createdTaskButFromList.assignedTo()).isEqualTo(createdTask.assignedTo())
-//            );
+//        step 7  get created task by id
+            MvcResult taskGeyByIdResponse = mockMvc.perform(get("/api/tasks/" + createdTask.id())
+                            .contentType(APPLICATION_JSON_VALUE))
+                    //then
+                            .andExpect(status().isOk())
+                            .andReturn();
+            TaskDto taskGetById = objectMapper.readValue(taskGeyByIdResponse.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertThat(taskGetById).isEqualTo(createdTask);
+//        step 8 DeleteTaskById
+            MvcResult deletedTaskByIdResponse = mockMvc.perform(delete("/api/tasks/" + createdTask.id())
+                            .contentType(APPLICATION_JSON_VALUE))
+                    //then
+                    .andExpect(status().isOk())
+                    .andReturn();
+            TaskDto deletedTaskById = objectMapper.readValue(deletedTaskByIdResponse.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertThat(deletedTaskById).isEqualTo(createdTask);
+//        step 9 check if database is empty
+            MvcResult taskListAfterDeleteTaskResponse = mockMvc.perform(get("/api/tasks")
+                        .contentType(APPLICATION_JSON_VALUE))
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+
+            List<TaskDto> taskListAfterDeleteTask = objectMapper.readValue(taskListAfterDeleteTaskResponse.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertThat(taskListAfterDeleteTask).isEmpty();
 //        Step 7: Test endpoints to validate filters.
 //        Step 8: An employee attempts to create a user/task and receives an error.
 //        Step 9: A manager attempts to create a user and receives an error.
@@ -77,7 +94,5 @@ public class ShouldAuthenticateAndManageTasks extends BaseIntegrationTest {
 //                Step 15: A manager tries to edit a task and receives an "OK" response.
 //                Step 16: Admin conducts CRUD operations on users.
 //        Step 17: An employee tries to mark a task as completed and receives an "OK" response.
-
     }
-
 }
