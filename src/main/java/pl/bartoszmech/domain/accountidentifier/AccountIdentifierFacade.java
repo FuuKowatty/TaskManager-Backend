@@ -20,15 +20,15 @@ public class AccountIdentifierFacade {
         return service.listUsers();
     }
 
-    public UserDto deleteById(String id) {
+    public UserDto deleteById(Long id) {
         return service.deleteById(id);
     }
 
-    public UserDto findById(String id) {
+    public UserDto findById(Long id) {
         return service.findById(id);
     }
 
-    public UserDto updateUser(String id, UpdateUserRequestDto userRequestDto) {
+    public UserDto updateUser(Long id, UpdateUserRequestDto userRequestDto) {
         service.checkIfEmailIsAlreadyUsedByOtherUser(id, userRequestDto);
         return service.updateUser(id, userRequestDto);
     }

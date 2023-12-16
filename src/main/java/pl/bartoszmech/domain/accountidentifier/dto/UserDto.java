@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record UserDto(
-        String id,
+        Long id,
         String firstName,
         String lastName,
         String email,

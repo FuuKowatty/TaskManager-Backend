@@ -48,19 +48,19 @@ class TaskService {
                 .toList();
     }
 
-    public TaskDto findById(Long id) {
+    public TaskDto findById(long id) {
         Task foundTask = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
         return TaskMapper.mapFromTask(foundTask);
     }
 
-    public TaskDto deleteById(Long id) {
+    public TaskDto deleteById(long id) {
         TaskDto deletedTask = findById(id);
         repository.deleteById(id);
         return deletedTask;
     }
 
-    public TaskDto updateTask(Long id, UpdateTaskRequestDto taskRequestDto, LocalDateTime startDate) {
+    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto, LocalDateTime startDate) {
         findById(id);
         Task newTask = new Task(
                 id,

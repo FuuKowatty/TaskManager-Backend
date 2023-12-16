@@ -25,16 +25,15 @@ public class TaskRepositoryTestImpl implements TaskRepository{
                         ,entity.getEndDate(), entity.getAssignedTo());
                 database.put(id, task);
                 return task;
-            } else {
-                Task task = new Task(entity.getId(), entity.getTitle(), entity.getDescription(), entity.isCompleted(), entity.getStartDate()
-                        ,entity.getEndDate(), entity.getAssignedTo());
-                database.replace(entity.getId(), task);
-                return task;
             }
+            Task task = new Task(entity.getId(), entity.getTitle(), entity.getDescription(), entity.isCompleted(), entity.getStartDate()
+                    ,entity.getEndDate(), entity.getAssignedTo());
+            database.replace(entity.getId(), task);
+            return task;
         }
     @Override
     public Optional<Task> findById(Long id) {
-        return database.values().stream().filter(task -> task.getId() == id).findFirst();
+        return database.values().stream().filter(task -> task.getId().equals(id)).findFirst();
     }
 
     @Override
