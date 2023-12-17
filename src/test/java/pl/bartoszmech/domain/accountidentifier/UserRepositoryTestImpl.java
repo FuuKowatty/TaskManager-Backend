@@ -17,6 +17,10 @@ public class UserRepositoryTestImpl implements UserRepository {
     ConcurrentHashMap<Long, User> database = new ConcurrentHashMap<>();
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return database.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
+    }
+    @Override
     public User save(User newUser) {
         if(newUser.getId() == null) {
             Random random = new Random();
@@ -104,6 +108,7 @@ public class UserRepositoryTestImpl implements UserRepository {
     public boolean existsByEmail(String email) {
         return !database.values().stream().filter(user -> user.getEmail().equals(email)).toList().isEmpty();
     }
+
 
     @Override
     public void flush() {

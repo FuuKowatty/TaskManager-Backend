@@ -1,6 +1,7 @@
 package pl.bartoszmech.domain.accountidentifier;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
@@ -17,6 +18,10 @@ class UserService {
 
     private final UserRepository repository;
 
+    UserDto findByEmail(String email) {
+        return UserMapper.mapFromUser(repository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND)));
+    }
     UserDto createUser(CreateUserRequestDto inputUser) {
         User savedUser = repository.save(new User(
                     inputUser.firstName(),

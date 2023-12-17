@@ -2,6 +2,7 @@ package pl.bartoszmech.infrastructure.user.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import static org.springframework.http.HttpStatus.OK;
 @AllArgsConstructor
 public class UserController {
     AccountIdentifierFacade accountIdentifierFacade;
+    PasswordEncoder passwordEncoder;
     @GetMapping
     public ResponseEntity<List<UserDto>> list() {
         return ResponseEntity.status(OK).body(accountIdentifierFacade.listUsers());
@@ -35,7 +37,13 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody CreateUserRequestDto requestDto) {
-        return ResponseEntity.status(CREATED).body(accountIdentifierFacade.createUser(requestDto));
+        return ResponseEntity.status(CREATED).body(accountIdentifierFacade.createUser(CreateUserRequestDto.builder()
+                .firstName(requestDto.firstName())
+                .lastName(requestDto.lastName())
+                .email(requestDto.email())
+                .password(passwordEncoder.encode(requestDto.password()))
+                .role(requestDto.role())
+                .build()));
     }
 
     @DeleteMapping("/{id}")
