@@ -11,6 +11,9 @@ import java.util.List;
 public class AccountIdentifierFacade {
     UserService service;
 
+    public UserDto findByEmail(String email) {
+        return service.findByEmail(email);
+    }
     public UserDto createUser(CreateUserRequestDto inputUser) {
         service.checkIfEmailIsAlreadyUsed(inputUser.email());
         return service.createUser(inputUser);

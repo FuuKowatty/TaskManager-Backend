@@ -10,7 +10,7 @@ import java.time.ZoneId;
 @Configuration
 public class ClockConfig {
     @Bean
-    public Clock adjustableClock() {
+    public AdjustableClock adjustableClock() {
         Instant initialInstant = Instant.now();
         ZoneId zone = ZoneId.systemDefault();
         return new AdjustableClock(initialInstant, zone);
