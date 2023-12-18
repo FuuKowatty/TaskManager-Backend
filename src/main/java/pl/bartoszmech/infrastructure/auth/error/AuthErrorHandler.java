@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pl.bartoszmech.domain.accountidentifier.EmailTakenException;
+import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
@@ -23,5 +25,11 @@ public class AuthErrorHandler {
     @ResponseBody
     public ResponseEntity<AuthErrorResponseBody> handleEmailTaken(EmailTakenException error) {
         return ResponseEntity.status(CONFLICT).body(new AuthErrorResponseBody(error.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    @ResponseBody
+    public ResponseEntity<AuthErrorResponseBody> handleEmailTaken(UnauthorizedAccessException error) {
+        return ResponseEntity.status(FORBIDDEN).body(new AuthErrorResponseBody(error.getMessage()));
     }
 }

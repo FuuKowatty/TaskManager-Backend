@@ -3,6 +3,7 @@
     import lombok.AllArgsConstructor;
     import org.springframework.context.annotation.Bean;
     import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpMethod;
     import org.springframework.security.authentication.AuthenticationManager;
     import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
     import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,13 +12,26 @@
     import org.springframework.security.web.SecurityFilterChain;
     import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+    import static org.springframework.http.HttpMethod.GET;
+    import static org.springframework.http.HttpMethod.PATCH;
     import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
     import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
+    import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
     import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
 
     @Configuration
     @AllArgsConstructor
     public class SecurityConfig {
+
+        private static final String[] WHITE_LIST_URL = {
+                "/accounts/token/**",
+                "/accounts/register/**",
+                "/swagger-resources",
+                "/swagger-resources/**",
+                "/swagger-ui/**",
+                "/webjars/**",
+                "/swagger-ui.html"
+        };
 
         private final JwtAuthTokenFilter jwtAuthTokenFilter;
 
@@ -38,11 +52,11 @@
                     .csrf(csrf -> csrf.disable())
                     .authorizeRequests(
                             auth -> auth
-                                    .requestMatchers("/swagger-ui/**").permitAll()
-                                    .requestMatchers("/accounts/token/**").permitAll()
-                                    .requestMatchers("/accounts/register/**").permitAll()
-                                    .requestMatchers("/swagger-resources/**").permitAll()
-                                    .requestMatchers("api/tasks").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
+                                    .requestMatchers(WHITE_LIST_URL).permitAll()
+                                    .requestMatchers(PATCH,"/api/tasks/{id}/complete").hasAnyAuthority(EMPLOYEE.getRoleName())
+                                    .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
+                                    .requestMatchers(GET,"/api/tasks/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
+                                    .requestMatchers("/api/tasks/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
                                     .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

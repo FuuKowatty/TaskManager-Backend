@@ -12,6 +12,7 @@ import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
+import pl.bartoszmech.infrastructure.auth.dto.TokenResponseDto;
 import pl.bartoszmech.infrastructure.security.jwt.JwtAuthenticatorFacade;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -26,9 +27,14 @@ public class AuthController {
     private final AccountIdentifierFacade accountIdentifierFacade;
     PasswordEncoder passwordEncoder;
     @PostMapping("/token")
-    public ResponseEntity<JwtResponseDto> authenticateAndGenerateToken(@RequestBody TokenRequestDto tokenRequestDto) {
-        final JwtResponseDto jwtResponseDto = jwtAuthenticatorFacade.authenticateAndGenerateToken(tokenRequestDto);
-        return ResponseEntity.status(OK).body(jwtResponseDto);
+    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@RequestBody TokenRequestDto tokenRequestDto) {
+        final JwtResponseDto jwtDto = jwtAuthenticatorFacade.authenticateAndGenerateToken(tokenRequestDto);
+        String email = jwtDto.username();
+        return ResponseEntity.status(OK).body(TokenResponseDto.builder()
+                .token(jwtDto.token())
+                .email(email)
+                .id(accountIdentifierFacade.findByEmail(email).id())
+                .build());
     }
 
     @PostMapping("/register")

@@ -49,5 +49,4 @@ public class JwtAuthenticatorFacade {
                 .withIssuer(issuer)
                 .sign(algorithm);
     }
-
 }
