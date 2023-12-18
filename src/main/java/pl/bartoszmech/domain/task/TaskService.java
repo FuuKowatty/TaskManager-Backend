@@ -16,7 +16,7 @@ import java.util.List;
 @Log4j2
 class TaskService {
     private static final String TASK_DUPLICATE = "Provided task is already assigned to this same user";
-    private  static String INVALID_DATE_ORDER = "Provided invalid dates order";
+    private  static final String INVALID_DATE_ORDER = "Provided invalid dates order";
     private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
 
     private final TaskRepository repository;
@@ -44,7 +44,7 @@ class TaskService {
         return repository
                 .findAll()
                 .stream()
-                .map(task -> TaskMapper.mapFromTask(task))
+                .map(TaskMapper::mapFromTask)
                 .toList();
     }
 
