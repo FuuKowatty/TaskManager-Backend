@@ -85,4 +85,8 @@ class TaskService {
                 .anyMatch(task -> task.title().equals(inputTask.title()) &&
                         task.assignedTo().equals(inputTask.assignedTo()));
     }
+
+    public void completeTask(long id) {
+        repository.markTaskAsCompleted(id);
+    }
 }
