@@ -26,7 +26,6 @@ public class BaseIntegrationTest {
     public MockMvc mockMvc;
     @Autowired
     public ObjectMapper objectMapper;
-
     @Container
     public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.1"));
     @DynamicPropertySource

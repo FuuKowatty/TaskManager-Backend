@@ -176,4 +176,9 @@ public class TaskRepositoryTestImpl implements TaskRepository{
     public Page<Task> findAll(Pageable pageable) {
         return null;
     }
+
+    @Override
+    public void markTaskAsCompleted(Long taskId) {
+
+    }
 }

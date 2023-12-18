@@ -35,4 +35,10 @@ public class AccountIdentifierFacade {
         service.checkIfEmailIsAlreadyUsedByOtherUser(id, userRequestDto);
         return service.updateUser(id, userRequestDto);
     }
+
+
+    public UserDto registerAdmin(CreateUserRequestDto inputUser) {
+        service.checkIfEmailIsAlreadyUsed(inputUser.email());
+        return service.createUser(inputUser);
+    }
 }

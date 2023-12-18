@@ -1,61 +1,69 @@
-package pl.bartoszmech.infrastructure.security.jwt;
+    package pl.bartoszmech.infrastructure.security.jwt;
 
-import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import pl.bartoszmech.domain.accountidentifier.AccountIdentifierFacade;
+    import lombok.AllArgsConstructor;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpMethod;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.security.web.SecurityFilterChain;
+    import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+    import static org.springframework.http.HttpMethod.GET;
+    import static org.springframework.http.HttpMethod.PATCH;
+    import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+    import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
+    import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
+    import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
 
-@Configuration
-@AllArgsConstructor
-public class SecurityConfig {
+    @Configuration
+    @AllArgsConstructor
+    public class SecurityConfig {
 
-    private final JwtAuthTokenFilter jwtAuthTokenFilter;
+        private static final String[] WHITE_LIST_URL = {
+                "/accounts/token/**",
+                "/accounts/register/**",
+                "/swagger-resources",
+                "/swagger-resources/**",
+                "/swagger-ui/**",
+                "/webjars/**",
+                "/swagger-ui.html"
+        };
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+        private final JwtAuthTokenFilter jwtAuthTokenFilter;
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+            return authenticationConfiguration.getAuthenticationManager();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+            httpSecurity
+                    .csrf(csrf -> csrf.disable())
+                    .authorizeRequests(
+                            auth -> auth
+                                    .requestMatchers(WHITE_LIST_URL).permitAll()
+                                    .requestMatchers(PATCH,"/api/tasks/{id}/complete").hasAnyAuthority(EMPLOYEE.getRoleName())
+                                    .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
+                                    .requestMatchers(GET,"/api/tasks/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
+                                    .requestMatchers("/api/tasks/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
+                                    .anyRequest().authenticated()
+                    )
+                    .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                    .headers(header -> header.frameOptions(op -> op.disable()))
+                    .httpBasic(httpBasic -> httpBasic.disable())
+                    .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class);
+            return httpSecurity.build();
+        }
+
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(AccountIdentifierFacade loginAndRegisterFacade) {
-        return new pl.bartoszmech.infrastructure.auth.UserDetailsService(loginAndRegisterFacade);
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf(csrf -> csrf.disable())
-                .authorizeRequests(
-                        auth -> auth
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/v3/api-docs").permitAll()
-                                .requestMatchers("/webjars/**").permitAll()
-                                .requestMatchers("/accounts/token/**").permitAll()
-                                .requestMatchers("/accounts/register/**").permitAll()
-                                .requestMatchers("/swagger-resources/**").permitAll()
-                                .requestMatchers("/api/users").permitAll()
-                                .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-                .headers(header -> header.frameOptions(op -> op.disable()))
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        return httpSecurity.build();
-    }
-
-}

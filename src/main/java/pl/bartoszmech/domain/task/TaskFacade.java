@@ -39,4 +39,15 @@ public class TaskFacade {
         taskService.checkIfStartDateIfBeforeEndDate(startDate, endDate);
         return taskService.updateTask(id, taskRequestDto, startDate);
     }
+
+    public List<TaskDto> listEmployeeTasks(long id) {
+        return taskService.listTasks()
+                .stream()
+                .filter(task -> task.assignedTo().equals(id))
+                .toList();
+    }
+
+    public void completeTask(long id) {
+        taskService.completeTask(id);
+    }
 }

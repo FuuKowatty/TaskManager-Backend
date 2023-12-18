@@ -1,6 +1,7 @@
 package pl.bartoszmech.domain.accountidentifier;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
@@ -15,12 +16,13 @@ import java.util.List;
 class UserService {
     private static final String EMAIL_TAKEN = "User email is taken";
     private static final String USER_NOT_FOUND = "User with provided id could not be found";
+    private static final String USER_NOT_FOUND_BY_EMAIL = "User with provided email could not be found";
 
     private final UserRepository repository;
 
     UserDto findByEmail(String email) {
         return UserMapper.mapFromUser(repository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND)));
+                .orElseThrow(() -> new BadCredentialsException(USER_NOT_FOUND_BY_EMAIL)));
     }
     UserDto createUser(CreateUserRequestDto inputUser) {
         User savedUser = repository.save(new User(

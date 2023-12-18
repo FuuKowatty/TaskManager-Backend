@@ -2,8 +2,6 @@ package pl.bartoszmech.infrastructure.security.jwt;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -41,7 +39,7 @@ public class JwtAuthenticatorFacade {
     private String createToken(User user) {
         String secretKey = properties.secret();
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
-        Instant now = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC);
+        Instant now = clock.instant();
         Instant expiresAt = now.plus(Duration.ofDays(properties.expirationDays()));
         String issuer = properties.issuer();
         return JWT.create()
@@ -51,5 +49,4 @@ public class JwtAuthenticatorFacade {
                 .withIssuer(issuer)
                 .sign(algorithm);
     }
-
 }
