@@ -17,6 +17,7 @@ public class TaskFacade {
     public TaskDto createTask(CreateTaskRequestDto taskRequestDto) {
         LocalDateTime startDate = LocalDateTime.now(clock);
         taskService.checkIfStartDateIfBeforeEndDate(startDate, taskRequestDto.endDate());
+        taskService.checkIfUserHaveAlreadyThisTask(taskRequestDto);
         return taskService.createTask(taskRequestDto, startDate);
     }
 
@@ -24,18 +25,29 @@ public class TaskFacade {
         return taskService.listTasks();
     }
 
-    public TaskDto findById(String id) {
+    public TaskDto findById(long id) {
         return taskService.findById(id);
     }
 
-    public TaskDto deleteById(String id) {
+    public TaskDto deleteById(long id) {
         return taskService.deleteById(id);
     }
 
-    public TaskDto updateTask(String id, UpdateTaskRequestDto taskRequestDto) {
+    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto) {
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = taskRequestDto.endDate();
         taskService.checkIfStartDateIfBeforeEndDate(startDate, endDate);
         return taskService.updateTask(id, taskRequestDto, startDate);
+    }
+
+    public List<TaskDto> listEmployeeTasks(long id) {
+        return taskService.listTasks()
+                .stream()
+                .filter(task -> task.assignedTo().equals(id))
+                .toList();
+    }
+
+    public void completeTask(long id) {
+        taskService.completeTask(id);
     }
 }

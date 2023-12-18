@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record CreateTaskRequestDto(
         String title,
         String description,
-        LocalDateTime endDate
+        LocalDateTime endDate,
+        Long assignedTo
 ) {
 }
