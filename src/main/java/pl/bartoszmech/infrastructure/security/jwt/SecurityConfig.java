@@ -57,6 +57,7 @@
                                     .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers(GET,"/api/tasks/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers("/api/tasks/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
+                                    .requestMatchers("/api/users/**").hasAuthority(ADMIN.getRoleName())
                                     .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
