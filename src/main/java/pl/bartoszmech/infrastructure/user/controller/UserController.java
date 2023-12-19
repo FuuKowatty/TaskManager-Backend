@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.domain.accountidentifier.AccountIdentifierFacade;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.UserFacade;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
+import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 
 import java.util.List;
 
@@ -25,21 +26,23 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
-    AccountIdentifierFacade accountIdentifierFacade;
+    UserFacade userFacade;
+    AuthorizationService authorizationService;
     PasswordEncoder passwordEncoder;
     @GetMapping
     public ResponseEntity<List<UserDto>> list() {
-        return ResponseEntity.status(OK).body(accountIdentifierFacade.listUsers());
+        return ResponseEntity.status(OK).body(userFacade.listUsers());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable("id") long id) {
-        return ResponseEntity.status(OK).body(accountIdentifierFacade.findById(id));
+        return ResponseEntity.status(OK).body(userFacade.findById(id));
     }
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody CreateUserRequestDto requestDto) {
-        return ResponseEntity.status(CREATED).body(accountIdentifierFacade.createUser(CreateUserRequestDto.builder()
+        authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
+        return ResponseEntity.status(CREATED).body(userFacade.createUser(CreateUserRequestDto.builder()
                 .firstName(requestDto.firstName())
                 .lastName(requestDto.lastName())
                 .email(requestDto.email())
@@ -50,11 +53,12 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserDto> deleteById(@PathVariable("id") long id) {
-        return ResponseEntity.status(OK).body(accountIdentifierFacade.deleteById(id));    }
+        return ResponseEntity.status(OK).body(userFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @RequestBody UpdateUserRequestDto req) {
-        return ResponseEntity.status(OK).body(accountIdentifierFacade.updateUser(id, req));    }
+    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @RequestBody UpdateUserRequestDto requestDto) {
+        authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
+        return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 
 }
 

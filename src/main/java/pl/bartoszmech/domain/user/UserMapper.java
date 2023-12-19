@@ -1,6 +1,6 @@
-package pl.bartoszmech.domain.accountidentifier;
+package pl.bartoszmech.domain.user;
 
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 
 class UserMapper {
     static UserDto mapFromUser(User savedTask) {

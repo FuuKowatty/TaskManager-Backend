@@ -5,7 +5,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import pl.bartoszmech.domain.accountidentifier.EmailTakenException;
+import pl.bartoszmech.domain.user.EmailTakenException;
 import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
