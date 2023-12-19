@@ -3,10 +3,11 @@
     import lombok.AllArgsConstructor;
     import org.springframework.context.annotation.Bean;
     import org.springframework.context.annotation.Configuration;
-    import org.springframework.http.HttpMethod;
     import org.springframework.security.authentication.AuthenticationManager;
     import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
     import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+    import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
     import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
     import org.springframework.security.crypto.password.PasswordEncoder;
     import org.springframework.security.web.SecurityFilterChain;
@@ -15,9 +16,9 @@
     import static org.springframework.http.HttpMethod.GET;
     import static org.springframework.http.HttpMethod.PATCH;
     import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-    import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
-    import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
-    import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
+    import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+    import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
+    import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
     @Configuration
     @AllArgsConstructor
@@ -49,7 +50,7 @@
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
             httpSecurity
-                    .csrf(csrf -> csrf.disable())
+                    .csrf(AbstractHttpConfigurer::disable)
                     .authorizeRequests(
                             auth -> auth
                                     .requestMatchers(WHITE_LIST_URL).permitAll()
@@ -57,11 +58,12 @@
                                     .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers(GET,"/api/tasks/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers("/api/tasks/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
+                                    .requestMatchers("/api/users/**").hasAuthority(ADMIN.getRoleName())
                                     .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-                    .headers(header -> header.frameOptions(op -> op.disable()))
-                    .httpBasic(httpBasic -> httpBasic.disable())
+                    .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                    .httpBasic(AbstractHttpConfigurer::disable)
                     .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class);
             return httpSecurity.build();
         }

@@ -11,7 +11,6 @@ import java.time.*;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.offset;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskFacadeTest {
@@ -73,12 +72,44 @@ public class TaskFacadeTest {
         assertThat(endDateBeforeStartDate.getMessage()).isEqualTo("Provided invalid dates order");
     }
 
+
+
     @Test
     public void should_success_return_empty_list_after_list_tasks() {
         //when
         List<TaskDto> tasks = taskFacade.listTasks();
         //then
         assertThat(tasks).isEmpty();
+    }
+
+    @Test
+    public void should_success_return_list_of_two_tasks_after_add_them() {
+        //given
+        long userId = 997L;
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+                        .title(title)
+                        .description(description)
+                        .endDate(endDate)
+                        .assignedTo(userId)
+                        .build());
+        TaskDto savedTask2 = taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title(title)
+                .description(description)
+                .endDate(endDate)
+                .assignedTo(userId+1)
+                .build());
+
+        //when
+        List<TaskDto> tasks = taskFacade.listTasks();
+        //then
+        assertThat(tasks.size()).isEqualTo(2);
+        assertThat(tasks).containsExactlyInAnyOrder(
+                savedTask,
+                savedTask2
+        );
     }
 
     @Test
@@ -99,6 +130,7 @@ public class TaskFacadeTest {
         //then
         assertThat(tasks.get(0)).isEqualTo(savedTask);
     }
+
 
     @Test
     public void should_find_task_by_id() {
@@ -166,7 +198,6 @@ public class TaskFacadeTest {
         long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
-        boolean isCompleted = true;
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusDays(1);
         TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
@@ -180,7 +211,6 @@ public class TaskFacadeTest {
         TaskDto updatedTask = taskFacade.updateTask(savedTask.id(), UpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
-                        .isCompleted(isCompleted)
                         .endDate(endDate)
                         .assignedTo(userId)
                         .build());
@@ -188,7 +218,6 @@ public class TaskFacadeTest {
         assertAll("Update task assertions",
                 () -> assertThat(updatedTask.title()).isEqualTo(title),
                 () -> assertThat(updatedTask.description()).isEqualTo(description),
-                () -> assertThat(updatedTask.isCompleted()).isEqualTo(isCompleted),
                 () -> assertThat(updatedTask.assignedTo()).isEqualTo(userId),
                 () -> assertThat(updatedTask.id()).isNotNull(),
                 () -> assertThat(updatedTask.id()).isEqualTo(savedTask.id()),
@@ -204,11 +233,10 @@ public class TaskFacadeTest {
         long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
-        boolean isCompleted = true;
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusDays(1);
         long id = 997L;
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
+        taskFacade.createTask(CreateTaskRequestDto
                 .builder()
                 .title("dododod")
                 .description("fkiwfofwofwowf")
@@ -219,7 +247,6 @@ public class TaskFacadeTest {
         Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.updateTask(id, UpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
-                        .isCompleted(isCompleted)
                         .endDate(endDate)
                         .assignedTo(userId)
                         .build()));
@@ -248,7 +275,6 @@ public class TaskFacadeTest {
                         .builder()
                         .title(title)
                         .description(description)
-                        .isCompleted(true)
                         .endDate(endDate)
                         .build())
         );
@@ -257,7 +283,32 @@ public class TaskFacadeTest {
     }
 
     @Test
-    public void should_throw_exception_if_assign_this_same_task_title_to_this_same_user() {
+    public void should_throw_exception_if_assign_this_same_task_title_to_this_same_user_updateTask() {
+        //given
+        long userId = 997L;
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title(title)
+                .description("fkiwfofwofwowf")
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
+                .build());
+        //when
+        Throwable duplicateUserTask = assertThrows(DuplicateUserTaskException.class,
+                () -> taskFacade.updateTask(savedTask.id(), UpdateTaskRequestDto.builder()
+                        .title(title)
+                        .description(description)
+                        .endDate(LocalDateTime.now(clock).plusSeconds(3))
+                        .assignedTo(userId)
+                        .build())
+        );
+        //then
+        assertThat(duplicateUserTask.getMessage()).isEqualTo("Provided task is already assigned to this same user");
+    }
+
+    @Test
+    public void should_throw_exception_if_assign_this_same_task_title_to_this_same_user_createTask() {
         //given
         long userId = 997L;
         String title = "RandomTitle";
@@ -302,4 +353,52 @@ public class TaskFacadeTest {
         assertThat(savedTask.title()).isNotEqualTo(newTask.title());
         assertThat(savedTask.assignedTo()).isEqualTo(newTask.assignedTo());
     }
+
+    @Test
+    public void should_list_only_employee_tasks_by_id() {
+        //given
+        long userId = 997L;
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title(title)
+                .description(description)
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
+                .build());
+        taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title(title)
+                .description(description)
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId+1)
+                .build());
+        taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title(title)
+                .description(description)
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId+2)
+                .build());
+        //when
+        List<TaskDto> foundTasks = taskFacade.listEmployeeTasks(userId);
+        //then
+        assertThat(foundTasks.size()).isEqualTo(1);
+        assertThat(foundTasks.get(0).assignedTo()).isEqualTo(userId);
+    }
+
+    @Test
+    public void should_success_mark_task_as_completed() {
+        //given
+        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+                .title("RandomTitle")
+                .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(997L)
+                .build());
+        //when
+        taskFacade.completeTask(savedTask.id());
+        //then
+        TaskDto updatedTask = taskFacade.findById(savedTask.id());
+        assertThat(updatedTask.isCompleted()).isTrue();
+    }
+
 }

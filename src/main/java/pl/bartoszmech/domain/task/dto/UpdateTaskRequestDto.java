@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public record UpdateTaskRequestDto(
         String title,
         String description,
-        boolean isCompleted,
         LocalDateTime endDate,
         Long assignedTo
 ) {

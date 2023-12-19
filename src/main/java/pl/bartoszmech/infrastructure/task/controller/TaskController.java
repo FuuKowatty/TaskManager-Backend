@@ -24,42 +24,44 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/tasks")
 @AllArgsConstructor
 public class TaskController {
     private final TaskFacade taskFacade;
     private final AuthorizationService authorizationService;
-    @GetMapping("/tasks")
+    @GetMapping
     public ResponseEntity<List<TaskDto>> listTasks() {
         return ResponseEntity.status(OK).body(taskFacade.listTasks());
     }
 
-    @GetMapping("/tasks/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TaskDto> findTaskById(@PathVariable("id") long id) {
         TaskDto task = findTaskAndCheckIfEmployeeHasPermission(id);
         return ResponseEntity.status(OK).body(task);
     }
 
-    @PostMapping("/tasks")
+    @PostMapping
     public ResponseEntity<TaskDto> createTask(@RequestBody CreateTaskRequestDto requestDto) {
+        authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(CREATED).body(taskFacade.createTask(requestDto));
     }
 
-    @DeleteMapping("/tasks/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<TaskDto> deleteTaskById(@PathVariable("id") long id) {
         return ResponseEntity.status(OK).body(taskFacade.deleteById(id));    }
 
-    @PutMapping("/tasks/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<TaskDto> deleteTaskById(@PathVariable("id") long id, @RequestBody UpdateTaskRequestDto  requestDto) {
+        authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(OK).body(taskFacade.updateTask(id, requestDto));
     }
 
-    @GetMapping("/tasks/employee/{id}")
+    @GetMapping("/employee/{id}")
     public ResponseEntity<List<TaskDto>> listEmployeeTasks(@PathVariable("id") long id) {
         return ResponseEntity.status(OK).body(taskFacade.listEmployeeTasks(id));
     }
 
-    @PatchMapping("/tasks/{id}/complete")
+    @PatchMapping("/{id}/complete")
     public ResponseEntity<TaskInfoResponse> completeTask(@PathVariable("id") long id) {
         findTaskAndCheckIfEmployeeHasPermission(id);
         taskFacade.completeTask(id);

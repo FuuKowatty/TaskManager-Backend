@@ -1,20 +1,22 @@
-package pl.bartoszmech.domain.accountidentifier;
+package pl.bartoszmech.domain.user;
 
 import org.junit.jupiter.api.Test;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import org.springframework.security.authentication.BadCredentialsException;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
+import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
-public class AccountIdentifierFacadeTest {
-    AccountIdentifierFacade accountIdentifierFacade = new AccountIdentifierFacade(new UserService(new UserRepositoryTestImpl()));
+public class UserFacadeTest {
+    UserFacade userFacade = new UserFacade(new UserService(new UserRepositoryTestImpl()));
     @Test
     public void should_successfully_create_user() {
         //given
@@ -24,7 +26,7 @@ public class AccountIdentifierFacadeTest {
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
         //when
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -47,7 +49,7 @@ public class AccountIdentifierFacadeTest {
     public void should_throw_exception_if_email_is_already_used() {
         //given
         String email = "example@gmail.com";
-        accountIdentifierFacade.createUser(CreateUserRequestDto
+        userFacade.createUser(CreateUserRequestDto
                         .builder()
                         .firstName("Dany")
                         .lastName("Abramov")
@@ -58,7 +60,7 @@ public class AccountIdentifierFacadeTest {
         //when
         Throwable emailTaken = assertThrows(
                 EmailTakenException.class,
-                () -> accountIdentifierFacade.createUser(CreateUserRequestDto.builder()
+                () -> userFacade.createUser(CreateUserRequestDto.builder()
                         .firstName("rifsif")
                         .lastName("KMduiroqr")
                         .email(email)
@@ -74,7 +76,7 @@ public class AccountIdentifierFacadeTest {
     @Test
     public void should_success_return_empty_list_after_list_users() {
         //when
-        List<UserDto> users = accountIdentifierFacade.listUsers();
+        List<UserDto> users = userFacade.listUsers();
         //then
         assertThat(users).isEmpty();
     }
@@ -87,7 +89,7 @@ public class AccountIdentifierFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -97,7 +99,7 @@ public class AccountIdentifierFacadeTest {
                 .build()
         );
         //when
-        List<UserDto> users = accountIdentifierFacade.listUsers();
+        List<UserDto> users = userFacade.listUsers();
         //then
         assertThat(users.get(0)).isEqualTo(savedUser);
     }
@@ -110,7 +112,7 @@ public class AccountIdentifierFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -120,7 +122,7 @@ public class AccountIdentifierFacadeTest {
                 .build()
         );
         //when
-        UserDto foundUser = accountIdentifierFacade.findById(savedUser.id());
+        UserDto foundUser = userFacade.findById(savedUser.id());
         //then
         assertThat(foundUser).isEqualTo(savedUser);
     }
@@ -130,7 +132,7 @@ public class AccountIdentifierFacadeTest {
         //given
         Long id = 997L;
         //when
-        Throwable userNotFound = assertThrows(ResourceNotFound.class, () -> accountIdentifierFacade.findById(id));
+        Throwable userNotFound = assertThrows(ResourceNotFound.class, () -> userFacade.findById(id));
         //then
         assertThat(userNotFound).isInstanceOf(ResourceNotFound.class);
         assertThat(userNotFound.getMessage()).isEqualTo("User with provided id could not be found");
@@ -144,7 +146,7 @@ public class AccountIdentifierFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -154,10 +156,10 @@ public class AccountIdentifierFacadeTest {
                 .build()
         );
         //when
-        UserDto deletedUser = accountIdentifierFacade.deleteById(savedUser.id());
+        UserDto deletedUser = userFacade.deleteById(savedUser.id());
         //then
         assertThat(deletedUser).isEqualTo(savedUser);
-        assertThat(accountIdentifierFacade.listUsers()).isEmpty();
+        assertThat(userFacade.listUsers()).isEmpty();
     }
 
     @Test
@@ -165,7 +167,7 @@ public class AccountIdentifierFacadeTest {
         //given
         long id = 997L;
         //when
-        Throwable userNotFound = assertThrows(ResourceNotFound.class, () -> accountIdentifierFacade.deleteById(id));
+        Throwable userNotFound = assertThrows(ResourceNotFound.class, () -> userFacade.deleteById(id));
         //then
         assertThat(userNotFound).isInstanceOf(ResourceNotFound.class);
         assertThat(userNotFound.getMessage()).isEqualTo("User with provided id could not be found");
@@ -179,7 +181,7 @@ public class AccountIdentifierFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName("OtherNameThanDany")
                 .lastName("OtherSurnameThanDany")
@@ -189,7 +191,7 @@ public class AccountIdentifierFacadeTest {
                 .build()
         );
         //when
-        UserDto updatedUser = accountIdentifierFacade.updateUser(savedUser.id(), UpdateUserRequestDto.builder()
+        UserDto updatedUser = userFacade.updateUser(savedUser.id(), UpdateUserRequestDto.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
@@ -214,7 +216,7 @@ public class AccountIdentifierFacadeTest {
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
         //when
-        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> accountIdentifierFacade.updateUser(id, UpdateUserRequestDto.builder()
+        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> userFacade.updateUser(id, UpdateUserRequestDto.builder()
                 .firstName("OtherNameThanDany")
                 .lastName("OtherSurnameThanDany")
                 .email("qwe123@qwe123.pl")
@@ -234,7 +236,7 @@ public class AccountIdentifierFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -243,7 +245,7 @@ public class AccountIdentifierFacadeTest {
                 .role(role)
                 .build()
         );
-        UserDto savedUser2 = accountIdentifierFacade.createUser(CreateUserRequestDto
+        UserDto savedUser2 = userFacade.createUser(CreateUserRequestDto
                 .builder()
                 .firstName("Bartosz")
                 .lastName("Mech")
@@ -255,7 +257,7 @@ public class AccountIdentifierFacadeTest {
         //when
         Throwable emailTaken = assertThrows(
                 EmailTakenException.class,
-                () -> accountIdentifierFacade.updateUser(savedUser2.id(), UpdateUserRequestDto.builder()
+                () -> userFacade.updateUser(savedUser2.id(), UpdateUserRequestDto.builder()
                         .firstName("rifsif")
                         .lastName("KMduiroqr")
                         .email(email)
@@ -267,5 +269,93 @@ public class AccountIdentifierFacadeTest {
         assertThat(emailTaken).isInstanceOf(EmailTakenException.class);
         assertThat(emailTaken.getMessage()).isEqualTo("User email is taken");
 
+    }
+
+    @Test
+    public void should_find_user_by_email() {
+        //given
+        String email = "example@gmail.com";
+        UserDto savedUser = userFacade.createUser(CreateUserRequestDto
+                .builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .role(EMPLOYEE)
+                .build()
+        );
+        //when
+        UserDto foundUser = userFacade.findByEmail(email);
+        //then
+        assertThat(foundUser).isEqualTo(savedUser);
+        assertThat(foundUser.id()).isNotNull();
+    }
+
+    @Test
+    public void should_throw_exception_if_client_provide_non_existing_email_in_findByEmail() {
+        //given
+        String nonExistingEmail = "example@gmail.com";
+        //when
+        Throwable userNotFound = assertThrows(BadCredentialsException.class, () -> userFacade.findByEmail(nonExistingEmail));assertThrows(BadCredentialsException.class, () -> userFacade.findByEmail(nonExistingEmail));
+        assertThat(userNotFound.getMessage()).isEqualTo("User with provided email could not be found");
+    }
+    //create with role user without passing role
+    @Test
+    public void should_create_user_with_admin_role_without_passing_any_role() {
+        //given
+        String email = "example@gmail.com";
+        //when
+        UserDto savedUser = userFacade.registerAdmin(CreateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .build()
+        );
+        //then
+        assertThat(savedUser.role()).isEqualTo(ADMIN);
+    }
+
+    @Test
+    public void should_create_user_with_admin_role_passing_other_role() {
+        //given
+        String email = "example@gmail.com";
+        //when
+        UserDto savedUser = userFacade.registerAdmin(CreateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .role(EMPLOYEE)
+                .build()
+        );
+        //then
+        assertThat(savedUser.role()).isEqualTo(ADMIN);
+    }
+
+    @Test
+    public void should_throw_email_is_existing_in_registerAdmin() {
+        //given
+        String email = "example@gmail.com";
+        userFacade.createUser(CreateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .role(EMPLOYEE)
+                .build());
+        //when
+        Throwable emailTaken = assertThrows(
+                EmailTakenException.class,
+                () -> userFacade.registerAdmin((CreateUserRequestDto.builder()
+                        .firstName("Dany")
+                        .lastName("Abramov")
+                        .email(email)
+                        .password("XXXXXXXX")
+                        .build()
+                ))
+        );
+        //then
+        assertThat(emailTaken.getMessage()).isEqualTo("User email is taken");
     }
 }

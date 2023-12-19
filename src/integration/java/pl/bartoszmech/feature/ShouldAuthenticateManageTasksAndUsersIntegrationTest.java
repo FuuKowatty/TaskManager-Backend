@@ -1,15 +1,12 @@
 package pl.bartoszmech.feature;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.dockerjava.api.model.Task;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
 import pl.bartoszmech.BaseIntegrationTest;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
 
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
@@ -28,11 +25,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
+import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
-public class TaskIntegrationTest extends BaseIntegrationTest {
+public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIntegrationTest {
     @Test
     public void should_authenticate_and_manage_tasks_if_user_has_permission() throws Exception {
         //SECURITY
@@ -100,10 +97,22 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                                 .password(employeePassword)
                                 .role(EMPLOYEE)
                                 .build())))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+                .andExpect(status().isCreated());
 
-        TokenResponseDto employee = objectMapper.readValue(mockMvc.perform(post("/accounts/token")
+        //creating second employee
+        mockMvc.perform(post("/api/users")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(CreateUserRequestDto.builder()
+                                .firstName("Adam")
+                                .lastName("Abramov")
+                                .email("employee2@gmail.com")
+                                .password(employeePassword)
+                                .role(EMPLOYEE)
+                                .build())))
+                .andExpect(status().isCreated());
+
+        TokenResponseDto danyEmployee = objectMapper.readValue(mockMvc.perform(post("/accounts/token")
                         .contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(TokenRequestDto.builder()
                                 .username(employeeEmail)
@@ -111,13 +120,23 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                                 .build())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(), TokenResponseDto.class);
-        String employeeToken = employee.token();
+
+        TokenResponseDto adamEmployee = objectMapper.readValue(mockMvc.perform(post("/accounts/token")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(TokenRequestDto.builder()
+                                .username("employee2@gmail.com")
+                                .password(employeePassword)
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString(), TokenResponseDto.class);
+
+        String employeeToken = danyEmployee.token();
 
 
         //Step 4: A user with incorrect email cannot log in.
         mockMvc.perform(post("/accounts/token")
-                .contentType(APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(TokenRequestDto.builder()
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(TokenRequestDto.builder()
                                 .username("NonExistingEmail@gmail.com")
                                 .password("zaq1@WSX")
                                 .build())))
@@ -133,7 +152,7 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                                 .title("created title by admin")
                                 .description("created description by admin")
                                 .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
-                                .assignedTo(employee.id())
+                                .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
@@ -148,7 +167,7 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                                 .title("created title by manager")
                                 .description("created description by manager")
                                 .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
-                                .assignedTo(employee.id())
+                                .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
@@ -163,12 +182,12 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                                 .title("tasktitle3")
                                 .description("taskdescription")
                                 .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
-                                .assignedTo(employee.id())
+                                .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isForbidden());
 
 
-        //Step 10: Employee cannot edit an existing task.
+        //Step 8: Employee cannot edit an existing task.
         mockMvc.perform(put("/api/tasks/" + createdTaskByAdmin.id())
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -181,12 +200,12 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isForbidden());
 
 
-        //Step 11: Manager can delete an existing task.
+        //Step 9: Manager can delete an existing task.
         mockMvc.perform(delete("/api/tasks/" + createdTaskByAdmin.id())
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
-        //Step 12: Employee cannot delete an existing task.
+        //Step 10: Employee cannot delete an existing task.
 
 
         mockMvc.perform(delete("/api/tasks/" + createdTaskByManager.id())
@@ -195,49 +214,51 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isForbidden());
 
 
-        //Step 13: Admin can view a list of tasks.
+        //Step 11: Admin can view a list of tasks.
         String adminListTasksResponse = mockMvc.perform(get("/api/tasks")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<TaskDto> adminListTask = objectMapper.readValue(adminListTasksResponse, new TypeReference<>() {});
+        List<TaskDto> adminListTask = objectMapper.readValue(adminListTasksResponse, new TypeReference<>() {
+        });
 
 
-        //Step 14: Manager can view a list of tasks.
+        //Step 12: Manager can view a list of tasks.
         String managerListTasksResponse = mockMvc.perform(get("/api/tasks")
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<TaskDto> managerListTask = objectMapper.readValue(managerListTasksResponse, new TypeReference<>() {});
+        List<TaskDto> managerListTask = objectMapper.readValue(managerListTasksResponse, new TypeReference<>() {
+        });
 
         assertThat(adminListTask).isNotEmpty();
         assertThat(adminListTask).isEqualTo(managerListTask);
 
 
-        //Step 15 Employee cannot view a list of tasks
+        //Step 13 Employee cannot view a list of tasks
         mockMvc.perform(get("/api/tasks")
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isForbidden());
 
 
-        //Step 16: Authenticated can view a list of employee tasks.
-        mockMvc.perform(get("/api/tasks/employee/" + employee.id())
+        //Step 14: Authenticated can view a list of employee tasks.
+        mockMvc.perform(get("/api/tasks/employee/" + danyEmployee.id())
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
 
 
-        //Step 17 Admin can see task by id
+        //Step 15 Admin can see task by id
         mockMvc.perform(get("/api/tasks/" + createdTaskByManager.id())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
 
 
-        //Step 18 Employee can see his task by id
+        //Step 16 Employee can see his task by id
         mockMvc.perform(get("/api/tasks/" + createdTaskByManager.id())
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE))
@@ -245,19 +266,19 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
 
-        //Step 19 Manager edit task assignedTo and employee do not get task because it is not assigned to him
-         String editedTaskByManagerResponse = mockMvc.perform(put("/api/tasks/" + createdTaskByManager.id())
+        //Step 17 Manager edit task assignedTo and employee do not get task because it is not assigned to him
+        String editedTaskByManagerResponse = mockMvc.perform(put("/api/tasks/" + createdTaskByManager.id())
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
                                 .title("edited title by manager")
                                 .description("I was updated by manager")
                                 .endDate(LocalDateTime.now(adjustableClock).plusDays(2))
-                                .assignedTo(employee.id()+1)
+                                .assignedTo(adamEmployee.id())
                                 .build())))
                 .andExpect(status().isOk())
-                 .andReturn().getResponse().getContentAsString();
-         TaskDto editedTaskByManager = objectMapper.readValue(editedTaskByManagerResponse, TaskDto.class);
+                .andReturn().getResponse().getContentAsString();
+        TaskDto editedTaskByManager = objectMapper.readValue(editedTaskByManagerResponse, TaskDto.class);
 
         mockMvc.perform(get("/api/tasks/" + editedTaskByManager.id())
                         .header("Authorization", "Bearer " + employeeToken)
@@ -265,35 +286,35 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isForbidden());
 
 
-        //Step 20 Manager can view task with updated id
+        //Step 18 Manager can view task with updated id
         mockMvc.perform(get("/api/tasks/" + editedTaskByManager.id())
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
 
 
-        //Step 21: Admin cannot mark a task as completed.
-        mockMvc.perform(patch("/api/tasks/"+ editedTaskByManager.id() +"/complete")
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(APPLICATION_JSON_VALUE))
+        //Step 19: Admin cannot mark a task as completed.
+        mockMvc.perform(patch("/api/tasks/" + editedTaskByManager.id() + "/complete")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isForbidden());
 
 
-        //Step 22: Manager cannot mark a task as completed.
-        mockMvc.perform(patch("/api/tasks/"+ editedTaskByManager.id() +"/complete")
+        //Step 20: Manager cannot mark a task as completed.
+        mockMvc.perform(patch("/api/tasks/" + editedTaskByManager.id() + "/complete")
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isForbidden());
 
 
-        //Step 23: Employee cannot mark task as completed because it is not assigned to him.
-        mockMvc.perform(patch("/api/tasks/"+ editedTaskByManager.id() +"/complete")
+        //Step 21: Employee cannot mark task as completed because it is not assigned to him.
+        mockMvc.perform(patch("/api/tasks/" + editedTaskByManager.id() + "/complete")
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isForbidden());
 
 
-        //Step 8: Admin can edit an existing task.
+        //Step 22: Admin can edit an existing task.
         String updatedTaskByAdminResponse = mockMvc.perform(put("/api/tasks/" + editedTaskByManager.id())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -301,54 +322,151 @@ public class TaskIntegrationTest extends BaseIntegrationTest {
                                 .title("edited title by admin")
                                 .description("I was updated by admin")
                                 .endDate(LocalDateTime.now(adjustableClock).plusDays(2))
-                                .assignedTo(employee.id())
+                                .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto  updatedTaskByAdmin = objectMapper.readValue(updatedTaskByAdminResponse, TaskDto.class);
+        TaskDto updatedTaskByAdmin = objectMapper.readValue(updatedTaskByAdminResponse, TaskDto.class);
 
 
-        // Step 25 Employee can mark as complete his task
-        mockMvc.perform(patch("/api/tasks/"+ updatedTaskByAdmin.id() +"/complete")
+        // Step 23 Employee can mark as complete his task
+        mockMvc.perform(patch("/api/tasks/" + updatedTaskByAdmin.id() + "/complete")
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
 
 
-        //Step 26 Admin can list all tasks and receive list with size 1
+        //Step 24 Admin can list all tasks and receive list with size 1
         String listTasksResponse = mockMvc.perform(get("/api/tasks")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<TaskDto> listTask = objectMapper.readValue(listTasksResponse, new TypeReference<>() {});
+        List<TaskDto> listTask = objectMapper.readValue(listTasksResponse, new TypeReference<>() {
+        });
         assertThat(listTask.size()).isEqualTo(1);
 
 
-        //Step 27: Admin can delete an existing task.
-        String deletedTaskResponse = mockMvc.perform(delete("/api/tasks/"+updatedTaskByAdmin.id())
+        //Step 25: Admin can delete an existing task.
+        String deletedTaskResponse = mockMvc.perform(delete("/api/tasks/" + updatedTaskByAdmin.id())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto deletedTask = objectMapper.readValue(deletedTaskResponse, new TypeReference<>() {});
+        TaskDto deletedTask = objectMapper.readValue(deletedTaskResponse, new TypeReference<>() {
+        });
 
         assertThat(deletedTask).isEqualTo(listTask.get(0));
         assertThat(deletedTask.isCompleted()).isTrue();
 
         //USER DOMAIN
-        //Step 21: Manager cannot add a new user.
-        //Step 22: Employee cannot add a new user.
-        //Step 23: Admin can edit an existing user.
-        //Step 24: Manager cannot edit an existing user.
-        //Step 25: Employee cannot edit an existing user.
-        //Step 26: Admin can delete an existing user.
-        //Step 27: Manager cannot delete an existing user.
-        //Step 28: Employee cannot delete an existing user.
-        //Step 29: Admin can read all users
-        //Step 30: Manager cannot read all users
-        //Step 31: Employee cannot read all user.
-        //findById?
-    }
+        //Step 26: Employee cannot add a new user.
+        mockMvc.perform(post("/api/users")
+                        .header("Authorization", "Bearer " + employeeToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
 
+
+        //Step 27: Manager cannot add a new user.
+        mockMvc.perform(post("/api/users")
+                        .header("Authorization", "Bearer " + managerToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 28: Employee cannot findById an existing user.
+        mockMvc.perform(get("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + employeeToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 29: Manager cannot findById an existing user.
+        mockMvc.perform(get("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + managerToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 30: Admin can findById an existing user.
+        mockMvc.perform(get("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+
+
+        //Step 31: Employee cannot read all users
+        mockMvc.perform(get("/api/users")
+                        .header("Authorization", "Bearer " + employeeToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 32: Manager cannot read all users
+        mockMvc.perform(get("/api/users")
+                        .header("Authorization", "Bearer " + managerToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 33: Admin can read all user.
+        mockMvc.perform(get("/api/users")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+
+
+        //Step 34: Employee cannot edit an existing user.
+        mockMvc.perform(put("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + employeeToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 35: Manager cannot edit an existing user.
+        mockMvc.perform(put("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + managerToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 36: Employee cannot delete an existing user.
+        mockMvc.perform(delete("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + employeeToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 37: Admin can edit an existing user.
+        String updatedUserResponse = mockMvc.perform(put("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(UpdateUserRequestDto.builder()
+                                .firstName("Danny")
+                                .lastName("Daniels")
+                                .email("abc@gmail.com")
+                                .password("password")
+                                .role(MANAGER)
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        UserDto updatedUser = objectMapper.readValue(updatedUserResponse, UserDto.class);
+
+
+        //Step 38: Manager cannot delete an existing user.
+        mockMvc.perform(delete("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + managerToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isForbidden());
+
+
+        //Step 39: Admin can delete an existing user.
+        String deletedUserResponse = mockMvc.perform(delete("/api/users/" + danyEmployee.id())
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        UserDto deletedUser = objectMapper.readValue(deletedUserResponse, UserDto.class);
+        assertThat(deletedUser).isEqualTo(updatedUser);
+    }
 }

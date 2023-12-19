@@ -1,14 +1,16 @@
-package pl.bartoszmech.domain.accountidentifier;
+package pl.bartoszmech.domain.user;
 
 import lombok.AllArgsConstructor;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 
 import java.util.List;
 
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+
 @AllArgsConstructor
-public class AccountIdentifierFacade {
+public class UserFacade {
     UserService service;
 
     public UserDto findByEmail(String email) {
@@ -36,9 +38,14 @@ public class AccountIdentifierFacade {
         return service.updateUser(id, userRequestDto);
     }
 
-
     public UserDto registerAdmin(CreateUserRequestDto inputUser) {
         service.checkIfEmailIsAlreadyUsed(inputUser.email());
-        return service.createUser(inputUser);
+        return service.createUser(CreateUserRequestDto.builder()
+                    .firstName(inputUser.firstName())
+                    .lastName(inputUser.lastName())
+                    .email(inputUser.email())
+                    .password(inputUser.password())
+                    .role(ADMIN)
+                    .build());
     }
 }

@@ -1,12 +1,11 @@
-package pl.bartoszmech.domain.accountidentifier;
+package pl.bartoszmech.domain.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 
 import java.util.List;
@@ -34,7 +33,6 @@ class UserService {
                 ));
         return UserMapper.mapFromUser(savedUser);
     }
-
 
     List<UserDto> listUsers() {
         return repository
