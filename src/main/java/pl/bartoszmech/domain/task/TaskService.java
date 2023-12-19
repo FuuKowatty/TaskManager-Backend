@@ -8,6 +8,7 @@ import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,26 +22,13 @@ class TaskService {
 
     private final TaskRepository repository;
 
-    TaskDto createTask(CreateTaskRequestDto task, LocalDateTime startDate) {
-        Task savedTask = repository.save(new Task(
-                task.title(),
-                task.description(),
-                false,
-                startDate,
-                task.endDate(),
-                task.assignedTo()
-        ));
+    TaskDto createTask(TaskDto inputTask) {
+        validateIfTaskCanBeCreated(inputTask);
+        Task savedTask = repository.save(TaskMapper.mapToTask(inputTask));
         return TaskMapper.mapFromTask(savedTask);
     }
 
-    void checkIfStartDateIfBeforeEndDate(LocalDateTime startDate, LocalDateTime endDate) {
-        if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
-            log.error(startDate + "cant be after or this same as " + endDate);
-            throw new EndDateBeforeStartDateException(INVALID_DATE_ORDER);
-        }
-    }
-
-    public List<TaskDto> listTasks() {
+    List<TaskDto> listTasks() {
         return repository
                 .findAll()
                 .stream()
@@ -48,45 +36,59 @@ class TaskService {
                 .toList();
     }
 
-    public TaskDto findById(long id) {
+    TaskDto findById(long id) {
         Task foundTask = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
         return TaskMapper.mapFromTask(foundTask);
     }
 
-    public TaskDto deleteById(long id) {
+    TaskDto deleteById(long id) {
         TaskDto deletedTask = findById(id);
         repository.deleteById(id);
         return deletedTask;
     }
 
-    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto, LocalDateTime startDate) {
+    TaskDto updateTask(long id, TaskDto inputTask) {
         findById(id);
+        validateIfTaskCanBeCreated(inputTask);
         Task newTask = new Task(
                 id,
-                taskRequestDto.title(),
-                taskRequestDto.description(),
-                taskRequestDto.isCompleted(),
-                startDate,
-                taskRequestDto.endDate(),
-                taskRequestDto.assignedTo()
+                inputTask.title(),
+                inputTask.description(),
+                inputTask.isCompleted(),
+                inputTask.startDate(),
+                inputTask.endDate(),
+                inputTask.assignedTo()
         );
         return TaskMapper.mapFromTask(repository.save(newTask));
     }
 
-    public void checkIfUserHaveAlreadyThisTask(CreateTaskRequestDto inputTask) {
+    void completeTask(long id) {
+        repository.markTaskAsCompleted(id);
+    }
+
+    private void validateIfTaskCanBeCreated(TaskDto inputTask) {
+        checkIfStartDateIfBeforeEndDate(inputTask.startDate(), inputTask.endDate());
+        checkIfUserHaveAlreadyThisTask(inputTask);
+    }
+
+    private void checkIfUserHaveAlreadyThisTask(TaskDto inputTask) {
         if(isTaskAssignedToSameUser(inputTask)) {
             throw new DuplicateUserTaskException(TASK_DUPLICATE);
         }
     }
 
-    private boolean isTaskAssignedToSameUser(CreateTaskRequestDto inputTask) {
+
+    private void checkIfStartDateIfBeforeEndDate(LocalDateTime startDate, LocalDateTime endDate) {
+        if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
+            log.error(startDate + "cant be after or this same as " + endDate);
+            throw new EndDateBeforeStartDateException(INVALID_DATE_ORDER);
+        }
+    }
+
+    private boolean isTaskAssignedToSameUser(TaskDto inputTask) {
         return listTasks().stream()
                 .anyMatch(task -> task.title().equals(inputTask.title()) &&
                         task.assignedTo().equals(inputTask.assignedTo()));
-    }
-
-    public void completeTask(long id) {
-        repository.markTaskAsCompleted(id);
     }
 }
