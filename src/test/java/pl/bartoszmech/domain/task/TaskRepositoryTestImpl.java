@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
+import pl.bartoszmech.domain.task.dto.TaskDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -178,6 +179,15 @@ public class TaskRepositoryTestImpl implements TaskRepository{
 
     @Override
     public void markTaskAsCompleted(Long taskId) {
-
+        Task task = database.get(taskId);
+        database.replace(taskId, new Task(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                true,
+                task.getStartDate(),
+                task.getEndDate(),
+                task.getAssignedTo()
+        ));
     }
 }

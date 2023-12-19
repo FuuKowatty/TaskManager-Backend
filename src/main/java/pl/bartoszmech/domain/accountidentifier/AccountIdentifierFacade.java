@@ -7,6 +7,8 @@ import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
 
 import java.util.List;
 
+import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
+
 @AllArgsConstructor
 public class AccountIdentifierFacade {
     UserService service;
@@ -36,9 +38,14 @@ public class AccountIdentifierFacade {
         return service.updateUser(id, userRequestDto);
     }
 
-
     public UserDto registerAdmin(CreateUserRequestDto inputUser) {
         service.checkIfEmailIsAlreadyUsed(inputUser.email());
-        return service.createUser(inputUser);
+        return service.createUser(CreateUserRequestDto.builder()
+                    .firstName(inputUser.firstName())
+                    .lastName(inputUser.lastName())
+                    .email(inputUser.email())
+                    .password(inputUser.password())
+                    .role(ADMIN)
+                    .build());
     }
 }
