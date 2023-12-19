@@ -3,14 +3,13 @@ package pl.bartoszmech.infrastructure.auth;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
-import pl.bartoszmech.domain.accountidentifier.AccountIdentifierFacade;
-import pl.bartoszmech.domain.accountidentifier.UserRoles;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.UserFacade;
+import pl.bartoszmech.domain.user.UserRoles;
+import pl.bartoszmech.domain.user.dto.UserDto;
 
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 
 @Service
 @AllArgsConstructor
@@ -19,7 +18,7 @@ public class AuthorizationService {
     public static final String TASK_NOT_ASSIGNED_TO_EMPLOYEE = "Invalid assignedTo, task should be assigned to user with role employee but was: ";
     private static final String ADMIN_CREATION_NOT_ALLOWED = "Admin cannot create other admin, please authenticate via valid endpoint";
 
-    AccountIdentifierFacade userFacade;
+    UserFacade userFacade;
     public void hasUserPermissionToReadTaskWithId(long taskId,  long assignedTo) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userFacade.findByEmail(auth.getName());

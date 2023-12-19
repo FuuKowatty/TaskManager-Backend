@@ -1,4 +1,4 @@
-package pl.bartoszmech.domain.accountidentifier;
+package pl.bartoszmech.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

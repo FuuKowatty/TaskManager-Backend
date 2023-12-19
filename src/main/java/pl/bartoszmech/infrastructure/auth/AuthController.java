@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.domain.accountidentifier.AccountIdentifierFacade;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.UserFacade;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenResponseDto;
@@ -17,14 +17,14 @@ import pl.bartoszmech.infrastructure.security.jwt.JwtAuthenticatorFacade;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 
 @RestController
 @RequestMapping("/accounts")
 @AllArgsConstructor
 public class AuthController {
     private final JwtAuthenticatorFacade jwtAuthenticatorFacade;
-    private final AccountIdentifierFacade accountIdentifierFacade;
+    private final UserFacade userFacade;
     PasswordEncoder passwordEncoder;
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@RequestBody TokenRequestDto tokenRequestDto) {
@@ -33,13 +33,13 @@ public class AuthController {
         return ResponseEntity.status(OK).body(TokenResponseDto.builder()
                 .token(jwtDto.token())
                 .email(email)
-                .id(accountIdentifierFacade.findByEmail(email).id())
+                .id(userFacade.findByEmail(email).id())
                 .build());
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerAdmin(@RequestBody CreateUserRequestDto user) {
-        return ResponseEntity.status(CREATED).body(accountIdentifierFacade.registerAdmin(CreateUserRequestDto.builder()
+        return ResponseEntity.status(CREATED).body(userFacade.registerAdmin(CreateUserRequestDto.builder()
                 .firstName(user.firstName())
                 .lastName(user.lastName())
                 .email(user.email())

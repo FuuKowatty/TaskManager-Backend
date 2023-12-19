@@ -16,9 +16,9 @@
     import static org.springframework.http.HttpMethod.GET;
     import static org.springframework.http.HttpMethod.PATCH;
     import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-    import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
-    import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
-    import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
+    import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+    import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
+    import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
     @Configuration
     @AllArgsConstructor

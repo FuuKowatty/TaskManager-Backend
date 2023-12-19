@@ -1,18 +1,14 @@
-package pl.bartoszmech.domain.accountidentifier;
+package pl.bartoszmech.domain.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
-import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
-import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
 
 import java.util.List;
-
-import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
 
 @AllArgsConstructor
 @Service
