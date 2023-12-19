@@ -15,6 +15,7 @@ import pl.bartoszmech.domain.accountidentifier.AccountIdentifierFacade;
 import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
+import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ import static org.springframework.http.HttpStatus.OK;
 @AllArgsConstructor
 public class UserController {
     AccountIdentifierFacade accountIdentifierFacade;
+    AuthorizationService authorizationService;
     PasswordEncoder passwordEncoder;
     @GetMapping
     public ResponseEntity<List<UserDto>> list() {
@@ -39,6 +41,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody CreateUserRequestDto requestDto) {
+        authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(CREATED).body(accountIdentifierFacade.createUser(CreateUserRequestDto.builder()
                 .firstName(requestDto.firstName())
                 .lastName(requestDto.lastName())
@@ -53,8 +56,9 @@ public class UserController {
         return ResponseEntity.status(OK).body(accountIdentifierFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @RequestBody UpdateUserRequestDto req) {
-        return ResponseEntity.status(OK).body(accountIdentifierFacade.updateUser(id, req));    }
+    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @RequestBody UpdateUserRequestDto requestDto) {
+        authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
+        return ResponseEntity.status(OK).body(accountIdentifierFacade.updateUser(id, requestDto));    }
 
 }
 

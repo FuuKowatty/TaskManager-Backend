@@ -8,8 +8,11 @@ import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
+import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
 
 import java.util.List;
+
+import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
 
 @AllArgsConstructor
 @Service
@@ -34,7 +37,6 @@ class UserService {
                 ));
         return UserMapper.mapFromUser(savedUser);
     }
-
 
     List<UserDto> listUsers() {
         return repository
