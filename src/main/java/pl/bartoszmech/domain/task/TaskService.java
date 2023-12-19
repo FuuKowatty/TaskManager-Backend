@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
-import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 

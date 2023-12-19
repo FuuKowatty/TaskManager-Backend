@@ -42,6 +42,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@RequestBody CreateTaskRequestDto requestDto) {
+        authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(CREATED).body(taskFacade.createTask(requestDto));
     }
 
@@ -51,6 +52,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TaskDto> deleteTaskById(@PathVariable("id") long id, @RequestBody UpdateTaskRequestDto  requestDto) {
+        authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(OK).body(taskFacade.updateTask(id, requestDto));
     }
 
