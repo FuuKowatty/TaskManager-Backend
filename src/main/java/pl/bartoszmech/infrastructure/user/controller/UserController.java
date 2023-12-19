@@ -16,6 +16,8 @@ import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
+import pl.bartoszmech.infrastructure.user.BestEmployeeDto;
+import pl.bartoszmech.infrastructure.user.BestEmployeeService;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class UserController {
     UserFacade userFacade;
     AuthorizationService authorizationService;
     PasswordEncoder passwordEncoder;
+    BestEmployeeService bestEmployeeService;
     @GetMapping
     public ResponseEntity<List<UserDto>> list() {
         return ResponseEntity.status(OK).body(userFacade.listUsers());
@@ -60,5 +63,10 @@ public class UserController {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 
+    @GetMapping("/sorted-by-completed-tasks")
+    public List<BestEmployeeDto> listBestEmployee() {
+        //add auth for manager and admin
+        return bestEmployeeService.getBestEmployee();
+    }
 }
 
