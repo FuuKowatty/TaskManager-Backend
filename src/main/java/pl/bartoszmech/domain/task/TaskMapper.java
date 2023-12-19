@@ -17,6 +17,19 @@ class TaskMapper {
                 .build();
     }
 
+    static Task mapToTask(TaskDto taskDto) {
+        return new Task(
+                taskDto.id(),
+                taskDto.title(),
+                taskDto.description(),
+                taskDto.isCompleted(),
+                taskDto.startDate(),
+                taskDto.endDate(),
+                taskDto.assignedTo()
+        );
+    }
+
+
     private static LocalDateTime reducePrecisionToSeconds(LocalDateTime dateTime) {
         return LocalDateTime.of(
                 dateTime.getYear(),
