@@ -8,6 +8,7 @@ import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,77 +17,78 @@ import java.util.List;
 @Log4j2
 class TaskService {
     private static final String TASK_DUPLICATE = "Provided task is already assigned to this same user";
-    private  static String INVALID_DATE_ORDER = "Provided invalid dates order";
+    private  static final String INVALID_DATE_ORDER = "Provided invalid dates order";
     private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
 
     private final TaskRepository repository;
 
-    TaskDto createTask(CreateTaskRequestDto task, LocalDateTime startDate) {
-        Task savedTask = repository.save(new Task(
-                task.title(),
-                task.description(),
-                false,
-                startDate,
-                task.endDate(),
-                task.assignedTo()
-        ));
+    TaskDto createTask(TaskDto inputTask) {
+        validateIfTaskCanBeCreated(inputTask);
+        Task savedTask = repository.save(TaskMapper.mapToTask(inputTask));
         return TaskMapper.mapFromTask(savedTask);
     }
 
-    void checkIfStartDateIfBeforeEndDate(LocalDateTime startDate, LocalDateTime endDate) {
+    List<TaskDto> listTasks() {
+        return repository
+                .findAll()
+                .stream()
+                .map(TaskMapper::mapFromTask)
+                .toList();
+    }
+
+    TaskDto findById(long id) {
+        Task foundTask = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
+        return TaskMapper.mapFromTask(foundTask);
+    }
+
+    TaskDto deleteById(long id) {
+        TaskDto deletedTask = findById(id);
+        repository.deleteById(id);
+        return deletedTask;
+    }
+
+    TaskDto updateTask(long id, TaskDto inputTask) {
+        findById(id);
+        validateIfTaskCanBeCreated(inputTask);
+        Task newTask = new Task(
+                id,
+                inputTask.title(),
+                inputTask.description(),
+                inputTask.isCompleted(),
+                inputTask.startDate(),
+                inputTask.endDate(),
+                inputTask.assignedTo()
+        );
+        return TaskMapper.mapFromTask(repository.save(newTask));
+    }
+
+    void completeTask(long id) {
+        repository.markTaskAsCompleted(id);
+    }
+
+    private void validateIfTaskCanBeCreated(TaskDto inputTask) {
+        checkIfStartDateIfBeforeEndDate(inputTask.startDate(), inputTask.endDate());
+        checkIfUserHaveAlreadyThisTask(inputTask);
+    }
+
+    private void checkIfUserHaveAlreadyThisTask(TaskDto inputTask) {
+        if(isTaskAssignedToSameUser(inputTask)) {
+            throw new DuplicateUserTaskException(TASK_DUPLICATE);
+        }
+    }
+
+
+    private void checkIfStartDateIfBeforeEndDate(LocalDateTime startDate, LocalDateTime endDate) {
         if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
             log.error(startDate + "cant be after or this same as " + endDate);
             throw new EndDateBeforeStartDateException(INVALID_DATE_ORDER);
         }
     }
 
-    public List<TaskDto> listTasks() {
-        return repository
-                .findAll()
-                .stream()
-                .map(task -> TaskMapper.mapFromTask(task))
-                .toList();
-    }
-
-    public TaskDto findById(long id) {
-        Task foundTask = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
-        return TaskMapper.mapFromTask(foundTask);
-    }
-
-    public TaskDto deleteById(long id) {
-        TaskDto deletedTask = findById(id);
-        repository.deleteById(id);
-        return deletedTask;
-    }
-
-    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto, LocalDateTime startDate) {
-        findById(id);
-        Task newTask = new Task(
-                id,
-                taskRequestDto.title(),
-                taskRequestDto.description(),
-                taskRequestDto.isCompleted(),
-                startDate,
-                taskRequestDto.endDate(),
-                taskRequestDto.assignedTo()
-        );
-        return TaskMapper.mapFromTask(repository.save(newTask));
-    }
-
-    public void checkIfUserHaveAlreadyThisTask(CreateTaskRequestDto inputTask) {
-        if(isTaskAssignedToSameUser(inputTask)) {
-            throw new DuplicateUserTaskException(TASK_DUPLICATE);
-        }
-    }
-
-    private boolean isTaskAssignedToSameUser(CreateTaskRequestDto inputTask) {
+    private boolean isTaskAssignedToSameUser(TaskDto inputTask) {
         return listTasks().stream()
                 .anyMatch(task -> task.title().equals(inputTask.title()) &&
                         task.assignedTo().equals(inputTask.assignedTo()));
-    }
-
-    public void completeTask(long id) {
-        repository.markTaskAsCompleted(id);
     }
 }

@@ -1,6 +1,7 @@
 package pl.bartoszmech.domain.accountidentifier;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.BadCredentialsException;
 import pl.bartoszmech.domain.accountidentifier.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.accountidentifier.dto.UserDto;
@@ -10,6 +11,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static pl.bartoszmech.domain.accountidentifier.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.accountidentifier.UserRoles.EMPLOYEE;
 import static pl.bartoszmech.domain.accountidentifier.UserRoles.MANAGER;
 
@@ -267,5 +269,93 @@ public class AccountIdentifierFacadeTest {
         assertThat(emailTaken).isInstanceOf(EmailTakenException.class);
         assertThat(emailTaken.getMessage()).isEqualTo("User email is taken");
 
+    }
+
+    @Test
+    public void should_find_user_by_email() {
+        //given
+        String email = "example@gmail.com";
+        UserDto savedUser = accountIdentifierFacade.createUser(CreateUserRequestDto
+                .builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .role(EMPLOYEE)
+                .build()
+        );
+        //when
+        UserDto foundUser = accountIdentifierFacade.findByEmail(email);
+        //then
+        assertThat(foundUser).isEqualTo(savedUser);
+        assertThat(foundUser.id()).isNotNull();
+    }
+
+    @Test
+    public void should_throw_exception_if_client_provide_non_existing_email_in_findByEmail() {
+        //given
+        String nonExistingEmail = "example@gmail.com";
+        //when
+        Throwable userNotFound = assertThrows(BadCredentialsException.class, () -> accountIdentifierFacade.findByEmail(nonExistingEmail));assertThrows(BadCredentialsException.class, () -> accountIdentifierFacade.findByEmail(nonExistingEmail));
+        assertThat(userNotFound.getMessage()).isEqualTo("User with provided email could not be found");
+    }
+    //create with role user without passing role
+    @Test
+    public void should_create_user_with_admin_role_without_passing_any_role() {
+        //given
+        String email = "example@gmail.com";
+        //when
+        UserDto savedUser = accountIdentifierFacade.registerAdmin(CreateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .build()
+        );
+        //then
+        assertThat(savedUser.role()).isEqualTo(ADMIN);
+    }
+
+    @Test
+    public void should_create_user_with_admin_role_passing_other_role() {
+        //given
+        String email = "example@gmail.com";
+        //when
+        UserDto savedUser = accountIdentifierFacade.registerAdmin(CreateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .role(EMPLOYEE)
+                .build()
+        );
+        //then
+        assertThat(savedUser.role()).isEqualTo(ADMIN);
+    }
+
+    @Test
+    public void should_throw_email_is_existing_in_registerAdmin() {
+        //given
+        String email = "example@gmail.com";
+        accountIdentifierFacade.createUser(CreateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(email)
+                .password("XXXXXXXX")
+                .role(EMPLOYEE)
+                .build());
+        //when
+        Throwable emailTaken = assertThrows(
+                EmailTakenException.class,
+                () -> accountIdentifierFacade.registerAdmin((CreateUserRequestDto.builder()
+                        .firstName("Dany")
+                        .lastName("Abramov")
+                        .email(email)
+                        .password("XXXXXXXX")
+                        .build()
+                ))
+        );
+        //then
+        assertThat(emailTaken.getMessage()).isEqualTo("User email is taken");
     }
 }

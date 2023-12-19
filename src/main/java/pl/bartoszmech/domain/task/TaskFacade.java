@@ -15,10 +15,13 @@ public class TaskFacade {
     private final Clock clock;
 
     public TaskDto createTask(CreateTaskRequestDto taskRequestDto) {
-        LocalDateTime startDate = LocalDateTime.now(clock);
-        taskService.checkIfStartDateIfBeforeEndDate(startDate, taskRequestDto.endDate());
-        taskService.checkIfUserHaveAlreadyThisTask(taskRequestDto);
-        return taskService.createTask(taskRequestDto, startDate);
+        return taskService.createTask(TaskDto.builder()
+                .title(taskRequestDto.title())
+                .description(taskRequestDto.description())
+                .startDate(getNow())
+                .endDate(taskRequestDto.endDate())
+                .assignedTo(taskRequestDto.assignedTo())
+                .build());
     }
 
     public List<TaskDto> listTasks() {
@@ -33,12 +36,16 @@ public class TaskFacade {
         return taskService.deleteById(id);
     }
 
-    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto) {
-        LocalDateTime startDate = LocalDateTime.now(clock);
-        LocalDateTime endDate = taskRequestDto.endDate();
-        taskService.checkIfStartDateIfBeforeEndDate(startDate, endDate);
-        return taskService.updateTask(id, taskRequestDto, startDate);
+    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto) {;
+        return taskService.updateTask(id,TaskDto.builder()
+                .title(taskRequestDto.title())
+                .description(taskRequestDto.description())
+                .startDate(getNow())
+                .endDate(taskRequestDto.endDate())
+                .assignedTo(taskRequestDto.assignedTo())
+                .build());
     }
+
 
     public List<TaskDto> listEmployeeTasks(long id) {
         return taskService.listTasks()
@@ -50,4 +57,9 @@ public class TaskFacade {
     public void completeTask(long id) {
         taskService.completeTask(id);
     }
+
+    private LocalDateTime getNow() {
+        return LocalDateTime.now(clock);
+    }
+
 }
