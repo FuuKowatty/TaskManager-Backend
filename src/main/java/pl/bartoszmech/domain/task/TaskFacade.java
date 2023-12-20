@@ -1,6 +1,7 @@
 package pl.bartoszmech.domain.task;
 
 import lombok.AllArgsConstructor;
+import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedToDto;
 import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
@@ -36,7 +37,7 @@ public class TaskFacade {
         return taskService.deleteById(id);
     }
 
-    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto) {;
+    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto) {
         return taskService.updateTask(id,TaskDto.builder()
                 .title(taskRequestDto.title())
                 .description(taskRequestDto.description())
@@ -56,6 +57,11 @@ public class TaskFacade {
 
     public void completeTask(long id) {
         taskService.completeTask(id);
+    }
+
+    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo(int lastMonths) {
+        LocalDateTime taskEndDateRange = getNow().minusMonths(lastMonths);
+        return taskService.getCompletedTasksByAssignedTo(taskEndDateRange);
     }
 
     private LocalDateTime getNow() {

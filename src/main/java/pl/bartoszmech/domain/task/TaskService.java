@@ -5,9 +5,12 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 import pl.bartoszmech.domain.task.dto.TaskDto;
+import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedToDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -87,5 +90,26 @@ class TaskService {
         return listTasks().stream()
                 .anyMatch(task -> task.title().equals(inputTask.title()) &&
                         task.assignedTo().equals(inputTask.assignedTo()));
+    }
+
+    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo(LocalDateTime taskEndDateRange) {
+        List<TaskDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
+        Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
+        return tasksByAssignedTo.entrySet().stream()
+                .map(entry -> new CompletedTasksByAssignedToDto(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private List<TaskDto> getTasksFromLastSixMonths(LocalDateTime taskEndDateRange) {
+        List<TaskDto> tasks = listTasks();
+        return tasks.stream()
+                .filter(task -> task.isCompleted() && task.endDate().isAfter(taskEndDateRange))
+                .toList();
+    }
+
+    private Map<Long, Integer> groupByAssignedToAndCountCompletedTasks(List<TaskDto> tasks) {
+        return tasks.stream()
+                .filter(task -> task.isCompleted())
+                .collect(Collectors.groupingBy(TaskDto::assignedTo, Collectors.summingInt(task -> 1)));
     }
 }
