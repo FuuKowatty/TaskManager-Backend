@@ -12,25 +12,25 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class BestEmployeeService {
+public class EmployeeStatisticService {
     TaskFacade taskFacade;
     UserFacade userFacade;
 
-    public List<BestEmployeeDto> getBestEmployee() {
-        List<CompletedTasksByAssignedToDto> completedTasksByAssignedToDtoList = taskFacade.getCompletedTasksByAssignedTo();
-        List<BestEmployeeDto> bestEmployeeDtoList = getUsersToCompletedTasks(completedTasksByAssignedToDtoList);
-        return bestEmployeeDtoList.stream()
-                .sorted(Comparator.comparing(BestEmployeeDto::numberOfCompletedTasks)
+    public List<EmployeeStatisticDto> sortEmployeesByCompletedTasks(int lastMonths) {
+        List<CompletedTasksByAssignedToDto> completedTasksOfEachEmployeeFromLastSixMonths = taskFacade.getCompletedTasksByAssignedTo(lastMonths);
+        List<EmployeeStatisticDto> employeeStatisticDtoList = getUsersToCompletedTasks(completedTasksOfEachEmployeeFromLastSixMonths);
+        return employeeStatisticDtoList.stream()
+                .sorted(Comparator.comparing(EmployeeStatisticDto::numberOfCompletedTasks)
                         .reversed())
                         .toList();
     }
 
-    private List<BestEmployeeDto> getUsersToCompletedTasks(List<CompletedTasksByAssignedToDto> completedTasksByAssignedToDtoList) {
+    private List<EmployeeStatisticDto> getUsersToCompletedTasks(List<CompletedTasksByAssignedToDto> completedTasksByAssignedToDtoList) {
         return completedTasksByAssignedToDtoList
                 .stream()
                 .map(task -> {
                     UserDto user = userFacade.findById(task.assignedTo());
-                    return new BestEmployeeDto(user, task.numberOfCompletedTasks());
+                    return new EmployeeStatisticDto(user, task.numberOfCompletedTasks());
                 })
                 .toList();
     }

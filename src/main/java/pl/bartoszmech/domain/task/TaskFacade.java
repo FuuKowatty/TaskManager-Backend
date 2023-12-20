@@ -59,8 +59,9 @@ public class TaskFacade {
         taskService.completeTask(id);
     }
 
-    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo() {
-        return taskService.getCompletedTasksByAssignedTo();
+    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo(int lastMonths) {
+        LocalDateTime taskEndDateRange = getNow().minusMonths(lastMonths);
+        return taskService.getCompletedTasksByAssignedTo(taskEndDateRange);
     }
 
     private LocalDateTime getNow() {

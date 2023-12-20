@@ -92,17 +92,24 @@ class TaskService {
                         task.assignedTo().equals(inputTask.assignedTo()));
     }
 
-    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo() {
-        List<Task> tasks = repository.findAll();
-        Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasks);
+    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo(LocalDateTime taskEndDateRange) {
+        List<TaskDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
+        Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
         return tasksByAssignedTo.entrySet().stream()
                 .map(entry -> new CompletedTasksByAssignedToDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
-    private Map<Long, Integer> groupByAssignedToAndCountCompletedTasks(List<Task> tasks) {
+    private List<TaskDto> getTasksFromLastSixMonths(LocalDateTime taskEndDateRange) {
+        List<TaskDto> tasks = listTasks();
         return tasks.stream()
-                .filter(Task::isCompleted)
-                .collect(Collectors.groupingBy(Task::getAssignedTo, Collectors.summingInt(task -> 1)));
+                .filter(task -> task.isCompleted() && task.endDate().isAfter(taskEndDateRange))
+                .toList();
+    }
+
+    private Map<Long, Integer> groupByAssignedToAndCountCompletedTasks(List<TaskDto> tasks) {
+        return tasks.stream()
+                .filter(task -> task.isCompleted())
+                .collect(Collectors.groupingBy(TaskDto::assignedTo, Collectors.summingInt(task -> 1)));
     }
 }

@@ -10,14 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.domain.user.UserFacade;
 import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
-import pl.bartoszmech.infrastructure.user.BestEmployeeDto;
-import pl.bartoszmech.infrastructure.user.BestEmployeeService;
+import pl.bartoszmech.infrastructure.user.EmployeeStatisticDto;
+import pl.bartoszmech.infrastructure.user.EmployeeStatisticService;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class UserController {
     UserFacade userFacade;
     AuthorizationService authorizationService;
     PasswordEncoder passwordEncoder;
-    BestEmployeeService bestEmployeeService;
+    EmployeeStatisticService employeeStatisticService;
     @GetMapping
     public ResponseEntity<List<UserDto>> list() {
         return ResponseEntity.status(OK).body(userFacade.listUsers());
@@ -63,10 +64,13 @@ public class UserController {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 
-    @GetMapping("/sorted-by-completed-tasks")
-    public List<BestEmployeeDto> listBestEmployee() {
-        //add auth for manager and admin
-        return bestEmployeeService.getBestEmployee();
+    @GetMapping("/stats/sorted-by-completed-tasks")
+    public List<EmployeeStatisticDto> listBestEmployee(@RequestParam(
+            name = "last-months",
+            required = false,
+            defaultValue = "6"
+    ) int lastMonths) {
+        return employeeStatisticService.sortEmployeesByCompletedTasks(lastMonths);
     }
 }
 
