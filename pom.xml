@@ -17,6 +17,7 @@
         <assertj-core.version>3.19.0</assertj-core.version>
         <lombok.version>1.18.30</lombok.version>
         <java-jwt.version>4.0.0</java-jwt.version>
+        <spring-boot-starter-validation.version>3.2.0</spring-boot-starter-validation.version>
     </properties>
     <dependencies>
         <dependency>
@@ -41,6 +42,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>${spring-boot-starter-validation.version}</version>
         </dependency>
 <!--        TEST-CONTAINERS-->
         <dependency>
