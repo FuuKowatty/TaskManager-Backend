@@ -23,6 +23,7 @@ public record UpdateTaskRequestDto(
         @Size(max = 255, message = "{task.description.too.long}")
         String description,
         @NotNull(message = "{task.endDate.required}")
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'hh:mm:ssZ", iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime endDate,
         @NotNull(message = "{task.assignedTo.required}")
         @Positive(message = "{task.assignedTo.positive}")
