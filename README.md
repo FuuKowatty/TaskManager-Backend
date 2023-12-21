@@ -1,11 +1,12 @@
-# JobOffers - Backend
-The JobOffers backend is a secure platform that allows users to
-to access job offers by authenticating themselves.
-It also allows users to create their own job offers.
-offers. It also contains a scheduler that updates
-offers from an external API every 3 hours.
-In addition, the application uses Redis caching for
-optimised performance and faster data retrieval.
+# TaskManager - Backend
+TaskManager is an application that organises the management team based on three roles:
+Administrator, Manager and Employee. This makes working very efficient and ensures that everyone knows what to do.
+
+The program implements Spring Security 6 + JSON Web Token, which provide authentication and authorisation.
+All logic is based on two domains: user and task.
+
+The application is based on a modular monolith with hexagonal architecture, so we have a clear direction between app logic and web services.
+
 
 ## Architecture
 ![Architecture](./architecture/architecture-v1.png)
