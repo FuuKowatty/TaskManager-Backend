@@ -58,8 +58,9 @@ public class TaskController {
         return ResponseEntity.status(OK).body(taskFacade.updateTask(id, requestDto));
     }
 
-    @GetMapping("/employee/{id}")
-    public ResponseEntity<List<TaskDto>> listEmployeeTasks(@PathVariable("id") long id) {
+    @GetMapping("/employee/{userId}")
+    public ResponseEntity<List<TaskDto>> listEmployeeTasks(@PathVariable("userId") long id) {
+        authorizationService.hasUserPermissionToReadTasksOfEmployee(id);
         return ResponseEntity.status(OK).body(taskFacade.listEmployeeTasks(id));
     }
 
