@@ -1,5 +1,6 @@
 package pl.bartoszmech.infrastructure.task.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +17,7 @@ import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
-import pl.bartoszmech.infrastructure.task.TaskInfoResponse;
+import pl.bartoszmech.infrastructure.task.TaskInfoResponseDto;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/tasks")
 @AllArgsConstructor
 public class TaskController {
+    public static final String TASK_COMPLETED = "Task completed";
     private final TaskFacade taskFacade;
     private final AuthorizationService authorizationService;
     @GetMapping
@@ -41,7 +43,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestBody CreateTaskRequestDto requestDto) {
+    public ResponseEntity<TaskDto> createTask(@RequestBody @Valid CreateTaskRequestDto requestDto) {
         authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(CREATED).body(taskFacade.createTask(requestDto));
     }
@@ -51,7 +53,7 @@ public class TaskController {
         return ResponseEntity.status(OK).body(taskFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> deleteTaskById(@PathVariable("id") long id, @RequestBody UpdateTaskRequestDto  requestDto) {
+    public ResponseEntity<TaskDto> editTaskById(@PathVariable("id") long id, @RequestBody @Valid UpdateTaskRequestDto  requestDto) {
         authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(OK).body(taskFacade.updateTask(id, requestDto));
     }
@@ -62,10 +64,10 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<TaskInfoResponse> completeTask(@PathVariable("id") long id) {
+    public ResponseEntity<TaskInfoResponseDto> completeTask(@PathVariable("id") long id) {
         findTaskAndCheckIfEmployeeHasPermission(id);
         taskFacade.completeTask(id);
-        return ResponseEntity.status(OK).body(new TaskInfoResponse("Task completed"));
+        return ResponseEntity.status(OK).body(new TaskInfoResponseDto(TASK_COMPLETED));
     }
 
     private TaskDto findTaskAndCheckIfEmployeeHasPermission(long id) {

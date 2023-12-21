@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedToDto;
+import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedtoResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,11 +92,11 @@ class TaskService {
                         task.assignedTo().equals(inputTask.assignedTo()));
     }
 
-    public List<CompletedTasksByAssignedToDto> getCompletedTasksByAssignedTo(LocalDateTime taskEndDateRange) {
+    public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(LocalDateTime taskEndDateRange) {
         List<TaskDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
         Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
         return tasksByAssignedTo.entrySet().stream()
-                .map(entry -> new CompletedTasksByAssignedToDto(entry.getKey(), entry.getValue()))
+                .map(entry -> new CompletedTasksByAssignedtoResponseDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 

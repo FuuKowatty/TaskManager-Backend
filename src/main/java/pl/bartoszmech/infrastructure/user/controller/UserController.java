@@ -1,5 +1,6 @@
 package pl.bartoszmech.infrastructure.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody CreateUserRequestDto requestDto) {
+    public ResponseEntity<UserDto> create(@Valid @RequestBody CreateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(CREATED).body(userFacade.createUser(CreateUserRequestDto.builder()
                 .firstName(requestDto.firstName())
@@ -60,7 +61,7 @@ public class UserController {
         return ResponseEntity.status(OK).body(userFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @RequestBody UpdateUserRequestDto requestDto) {
+    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody UpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 

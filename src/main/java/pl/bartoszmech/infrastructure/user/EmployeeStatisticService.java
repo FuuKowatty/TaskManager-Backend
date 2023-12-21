@@ -3,7 +3,7 @@ package pl.bartoszmech.infrastructure.user;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.task.TaskFacade;
-import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedToDto;
+import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedtoResponseDto;
 import pl.bartoszmech.domain.user.UserFacade;
 import pl.bartoszmech.domain.user.dto.UserDto;
 
@@ -17,7 +17,7 @@ public class EmployeeStatisticService {
     UserFacade userFacade;
 
     public List<EmployeeStatisticDto> sortEmployeesByCompletedTasks(int lastMonths) {
-        List<CompletedTasksByAssignedToDto> completedTasksOfEachEmployeeFromLastSixMonths = taskFacade.getCompletedTasksByAssignedTo(lastMonths);
+        List<CompletedTasksByAssignedtoResponseDto> completedTasksOfEachEmployeeFromLastSixMonths = taskFacade.getCompletedTasksByAssignedTo(lastMonths);
         List<EmployeeStatisticDto> employeeStatisticDtoList = getUsersToCompletedTasks(completedTasksOfEachEmployeeFromLastSixMonths);
         return employeeStatisticDtoList.stream()
                 .sorted(Comparator.comparing(EmployeeStatisticDto::numberOfCompletedTasks)
@@ -25,8 +25,8 @@ public class EmployeeStatisticService {
                         .toList();
     }
 
-    private List<EmployeeStatisticDto> getUsersToCompletedTasks(List<CompletedTasksByAssignedToDto> completedTasksByAssignedToDtoList) {
-        return completedTasksByAssignedToDtoList
+    private List<EmployeeStatisticDto> getUsersToCompletedTasks(List<CompletedTasksByAssignedtoResponseDto> completedTasksByAssignedtoResponseDtoList) {
+        return completedTasksByAssignedtoResponseDtoList
                 .stream()
                 .map(task -> {
                     UserDto user = userFacade.findById(task.assignedTo());
