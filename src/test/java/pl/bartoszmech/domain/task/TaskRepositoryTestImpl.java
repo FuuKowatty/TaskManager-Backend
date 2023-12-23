@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
+
 public class TaskRepositoryTestImpl implements TaskRepository{
     ConcurrentHashMap<Long, Task> database = new ConcurrentHashMap<>();
 
@@ -20,13 +22,13 @@ public class TaskRepositoryTestImpl implements TaskRepository{
         if (entity.getId() == null) {
             Random random = new Random();
             long id = random.nextLong();
-            Task task = new Task(id, entity.getTitle(), entity.getDescription(), entity.isCompleted(), entity.getStartDate()
-                    ,entity.getEndDate(), entity.getAssignedTo());
+            Task task = new Task(id, entity.getTitle(), entity.getDescription(), entity.getStatus(), entity.getStartDate()
+                    ,entity.getEndDate(), entity.getCompletedAt(), entity.getAssignedTo());
             database.put(id, task);
             return task;
         }
-        Task task = new Task(entity.getId(), entity.getTitle(), entity.getDescription(), entity.isCompleted(), entity.getStartDate()
-                ,entity.getEndDate(), entity.getAssignedTo());
+        Task task = new Task(entity.getId(), entity.getTitle(), entity.getDescription(), entity.getStatus(), entity.getStartDate()
+                ,entity.getEndDate(), entity.getCompletedAt(),entity.getAssignedTo());
         database.replace(entity.getId(), task);
         return task;
     }
@@ -176,17 +178,4 @@ public class TaskRepositoryTestImpl implements TaskRepository{
         return null;
     }
 
-    @Override
-    public void markTaskAsCompleted(Long taskId) {
-        Task task = database.get(taskId);
-        database.replace(taskId, new Task(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                true,
-                task.getStartDate(),
-                task.getEndDate(),
-                task.getAssignedTo()
-        ));
-    }
 }

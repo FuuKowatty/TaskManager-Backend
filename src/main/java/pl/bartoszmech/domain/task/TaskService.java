@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
+import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedtoResponseDto;
 
@@ -11,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
 
 @AllArgsConstructor
 @Service
@@ -48,23 +51,32 @@ class TaskService {
         return deletedTask;
     }
 
-    TaskDto updateTask(long id, TaskDto inputTask) {
-        findById(id);
+    TaskDto updateTask(TaskDto inputTask) {
         validateIfTaskCanBeCreated(inputTask);
-        Task newTask = new Task(
-                id,
+        return TaskMapper.mapFromTask(repository.save(new Task(
+                inputTask.id(),
                 inputTask.title(),
                 inputTask.description(),
-                inputTask.isCompleted(),
+                inputTask.status(),
                 inputTask.startDate(),
                 inputTask.endDate(),
+                inputTask.completedAt(),
                 inputTask.assignedTo()
-        );
-        return TaskMapper.mapFromTask(repository.save(newTask));
+        )));
     }
 
-    void completeTask(long id) {
-        repository.markTaskAsCompleted(id);
+    void completeTask(long id, LocalDateTime completedAt) {
+        TaskDto foundTask = findById(id);
+        repository.save(new Task(
+                foundTask.id(),
+                foundTask.title(),
+                foundTask.description(),
+                COMPLETED,
+                foundTask.startDate(),
+                foundTask.endDate(),
+                completedAt,
+                foundTask.assignedTo()
+        ));
     }
 
     private void validateIfTaskCanBeCreated(TaskDto inputTask) {
@@ -72,7 +84,7 @@ class TaskService {
         checkIfUserHaveAlreadyThisTask(inputTask);
     }
 
-    private void checkIfUserHaveAlreadyThisTask(TaskDto inputTask) {
+    public void checkIfUserHaveAlreadyThisTask(TaskDto inputTask) {
         if(isTaskAssignedToSameUser(inputTask)) {
             throw new DuplicateUserTaskException(TASK_DUPLICATE);
         }
@@ -103,13 +115,13 @@ class TaskService {
     private List<TaskDto> getTasksFromLastSixMonths(LocalDateTime taskEndDateRange) {
         List<TaskDto> tasks = listTasks();
         return tasks.stream()
-                .filter(task -> task.isCompleted() && task.endDate().isAfter(taskEndDateRange))
+                .filter(task -> task.status() == COMPLETED && task.endDate().isAfter(taskEndDateRange))
                 .toList();
     }
 
     private Map<Long, Integer> groupByAssignedToAndCountCompletedTasks(List<TaskDto> tasks) {
         return tasks.stream()
-                .filter(task -> task.isCompleted())
+                .filter(task -> task.status() == COMPLETED)
                 .collect(Collectors.groupingBy(TaskDto::assignedTo, Collectors.summingInt(task -> 1)));
     }
 }

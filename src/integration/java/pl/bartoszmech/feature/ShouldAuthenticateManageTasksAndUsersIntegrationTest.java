@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
 import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
@@ -358,7 +359,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         });
 
         assertThat(deletedTask).isEqualTo(listTask.get(0));
-        assertThat(deletedTask.status()).isEqualTo(PENDING);
+        assertThat(deletedTask.status()).isEqualTo(COMPLETED);
 
         //USER DOMAIN
         //Step 26: Employee cannot add a new user.

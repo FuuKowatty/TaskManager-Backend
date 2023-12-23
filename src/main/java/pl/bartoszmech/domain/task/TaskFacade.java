@@ -2,25 +2,28 @@ package pl.bartoszmech.domain.task;
 
 import lombok.AllArgsConstructor;
 import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedtoResponseDto;
-import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
+import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @AllArgsConstructor
 public class TaskFacade {
     private final TaskService taskService;
     private final Clock clock;
 
-    public TaskDto createTask(CreateTaskRequestDto taskRequestDto) {
+    public TaskDto createTask(CreateAndUpdateTaskRequestDto taskRequestDto) {
         return taskService.createTask(TaskDto.builder()
                 .title(taskRequestDto.title())
                 .description(taskRequestDto.description())
+                .status(PENDING)
                 .startDate(getNow())
                 .endDate(taskRequestDto.endDate())
+                .completedAt(null)
                 .assignedTo(taskRequestDto.assignedTo())
                 .build());
     }
@@ -37,12 +40,16 @@ public class TaskFacade {
         return taskService.deleteById(id);
     }
 
-    public TaskDto updateTask(long id, UpdateTaskRequestDto taskRequestDto) {
-        return taskService.updateTask(id,TaskDto.builder()
+    public TaskDto updateTask(long id, CreateAndUpdateTaskRequestDto taskRequestDto) {
+        TaskDto foundTask = taskService.findById(id);
+        return taskService.updateTask(TaskDto.builder()
+                .id(foundTask.id())
                 .title(taskRequestDto.title())
                 .description(taskRequestDto.description())
-                .startDate(getNow())
+                .startDate(foundTask.startDate())
                 .endDate(taskRequestDto.endDate())
+                .completedAt(foundTask.completedAt())
+                .status(foundTask.status())
                 .assignedTo(taskRequestDto.assignedTo())
                 .build());
     }
@@ -56,7 +63,7 @@ public class TaskFacade {
     }
 
     public void completeTask(long id) {
-        taskService.completeTask(id);
+        taskService.completeTask(id, getNow());
     }
 
     public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {

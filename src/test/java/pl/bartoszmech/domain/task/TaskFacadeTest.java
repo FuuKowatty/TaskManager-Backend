@@ -3,15 +3,15 @@ package pl.bartoszmech.domain.task;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
-import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
+import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 
 import java.time.*;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 public class TaskFacadeTest {
     @Mock
@@ -30,7 +30,7 @@ public class TaskFacadeTest {
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusSeconds(1);
         //when
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto
                         .builder()
                         .title(title)
                         .description(description)
@@ -42,7 +42,7 @@ public class TaskFacadeTest {
         assertAll("Task assertions",
                 () -> assertThat(savedTask.title()).isEqualTo(title),
                 () -> assertThat(savedTask.description()).isEqualTo(description),
-                () -> assertThat(savedTask.isCompleted()).isEqualTo(false),
+                () -> assertThat(savedTask.status()).isEqualTo(PENDING),
                 () -> assertThat(savedTask.id()).isNotNull(),
                 () -> assertTrue(endDate.isAfter(startDate)),
                 () -> assertThat(savedTask.assignedTo()).isEqualTo(userId)
@@ -60,7 +60,7 @@ public class TaskFacadeTest {
         //when
         Throwable endDateBeforeStartDate = assertThrows(
                 EndDateBeforeStartDateException.class,
-                () -> taskFacade.createTask(CreateTaskRequestDto
+                () -> taskFacade.createTask(CreateAndUpdateTaskRequestDto
                         .builder()
                         .title(title)
                         .description(description)
@@ -89,13 +89,13 @@ public class TaskFacadeTest {
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
                         .endDate(endDate)
                         .assignedTo(userId)
                         .build());
-        TaskDto savedTask2 = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask2 = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title(title)
                 .description(description)
                 .endDate(endDate)
@@ -119,7 +119,7 @@ public class TaskFacadeTest {
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                             .title(title)
                             .description(description)
                             .endDate(endDate)
@@ -139,7 +139,7 @@ public class TaskFacadeTest {
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
                         .endDate(endDate)
@@ -168,7 +168,7 @@ public class TaskFacadeTest {
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime endDate = LocalDateTime.now(clock).plusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto
                 .builder()
                 .title(title)
                 .description(description)
@@ -200,7 +200,7 @@ public class TaskFacadeTest {
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusDays(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto
                 .builder()
                 .title("dododod")
                 .description("fkiwfofwofwowf")
@@ -208,7 +208,7 @@ public class TaskFacadeTest {
                 .assignedTo(userId)
                 .build());
         //when
-        TaskDto updatedTask = taskFacade.updateTask(savedTask.id(), UpdateTaskRequestDto.builder()
+        TaskDto updatedTask = taskFacade.updateTask(savedTask.id(), CreateAndUpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
                         .endDate(endDate)
@@ -236,7 +236,7 @@ public class TaskFacadeTest {
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.plusDays(1);
         long id = 997L;
-        taskFacade.createTask(CreateTaskRequestDto
+        taskFacade.createTask(CreateAndUpdateTaskRequestDto
                 .builder()
                 .title("dododod")
                 .description("fkiwfofwofwowf")
@@ -244,7 +244,7 @@ public class TaskFacadeTest {
                 .assignedTo(userId)
                 .build());
         //when
-        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.updateTask(id, UpdateTaskRequestDto.builder()
+        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> taskFacade.updateTask(id, CreateAndUpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
                         .endDate(endDate)
@@ -262,20 +262,22 @@ public class TaskFacadeTest {
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
         LocalDateTime startDate = LocalDateTime.now(clock);
         LocalDateTime endDate = startDate.minusSeconds(1);
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title("dododod")
                 .description("fkiwfofwofwowf")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
                 .assignedTo(userId)
                 .build());
+
         //when
         Throwable endDateBeforeStartDate = assertThrows(
                 EndDateBeforeStartDateException.class,
-                () -> taskFacade.updateTask(savedTask.id(), UpdateTaskRequestDto
+                () -> taskFacade.updateTask(savedTask.id(), CreateAndUpdateTaskRequestDto
                         .builder()
                         .title(title)
                         .description(description)
                         .endDate(endDate)
+                        .assignedTo(userId)
                         .build())
         );
         //then
@@ -288,7 +290,7 @@ public class TaskFacadeTest {
         long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title(title)
                 .description("fkiwfofwofwowf")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
@@ -296,7 +298,7 @@ public class TaskFacadeTest {
                 .build());
         //when
         Throwable duplicateUserTask = assertThrows(DuplicateUserTaskException.class,
-                () -> taskFacade.updateTask(savedTask.id(), UpdateTaskRequestDto.builder()
+                () -> taskFacade.updateTask(savedTask.id(), CreateAndUpdateTaskRequestDto.builder()
                         .title(title)
                         .description(description)
                         .endDate(LocalDateTime.now(clock).plusSeconds(3))
@@ -313,7 +315,7 @@ public class TaskFacadeTest {
         long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
-        taskFacade.createTask(CreateTaskRequestDto.builder()
+        taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title(title)
                 .description("fkiwfofwofwowf")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
@@ -321,7 +323,7 @@ public class TaskFacadeTest {
                 .build());
         //when
         Throwable duplicateUserTask = assertThrows(DuplicateUserTaskException.class,
-                () -> taskFacade.createTask(CreateTaskRequestDto.builder()
+                () -> taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                     .title(title)
                     .description(description)
                     .endDate(LocalDateTime.now(clock).plusSeconds(3))
@@ -336,14 +338,14 @@ public class TaskFacadeTest {
     public void should_success_create_task_with_same_title_but_assigned_to_other_user() {
         //given
         long userId = 997L;
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title("RandomTitle")
                 .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
                 .assignedTo(userId)
                 .build());
         //when
-        TaskDto newTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto newTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                         .title("Rdaiodiod")
                         .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
                         .endDate(LocalDateTime.now(clock).plusSeconds(3))
@@ -360,19 +362,19 @@ public class TaskFacadeTest {
         long userId = 997L;
         String title = "RandomTitle";
         String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
-        taskFacade.createTask(CreateTaskRequestDto.builder()
+        taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title(title)
                 .description(description)
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
                 .assignedTo(userId)
                 .build());
-        taskFacade.createTask(CreateTaskRequestDto.builder()
+        taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title(title)
                 .description(description)
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
                 .assignedTo(userId+1)
                 .build());
-        taskFacade.createTask(CreateTaskRequestDto.builder()
+        taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title(title)
                 .description(description)
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
@@ -388,7 +390,7 @@ public class TaskFacadeTest {
     @Test
     public void should_success_mark_task_as_completed() {
         //given
-        TaskDto savedTask = taskFacade.createTask(CreateTaskRequestDto.builder()
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
                 .title("RandomTitle")
                 .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
                 .endDate(LocalDateTime.now(clock).plusSeconds(1))
@@ -398,7 +400,7 @@ public class TaskFacadeTest {
         taskFacade.completeTask(savedTask.id());
         //then
         TaskDto updatedTask = taskFacade.findById(savedTask.id());
-        assertThat(updatedTask.isCompleted()).isTrue();
+        assertThat(updatedTask.status()).isEqualTo(TaskStatus.COMPLETED);
     }
 
 }

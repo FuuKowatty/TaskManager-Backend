@@ -1,10 +1,7 @@
 package pl.bartoszmech.domain.task.dto;
 
-import jakarta.validation.constraints.AssertFalse;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import pl.bartoszmech.domain.task.TaskStatus;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +10,10 @@ public record TaskDto(
         Long id,
         String title,
         String description,
-        boolean isCompleted,
+        TaskStatus status,
         LocalDateTime startDate,
         LocalDateTime endDate,
+        LocalDateTime completedAt,
         Long assignedTo
 ) {
 }

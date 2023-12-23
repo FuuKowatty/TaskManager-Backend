@@ -8,8 +8,4 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 interface TaskRepository extends JpaRepository<Task, Long> {
-    @Transactional
-    @Modifying
-    @Query("UPDATE Task t SET t.isCompleted = true WHERE t.id = :taskId")
-    void markTaskAsCompleted(Long taskId);
 }

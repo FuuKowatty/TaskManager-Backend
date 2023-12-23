@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.bartoszmech.infrastructure.clock.AdjustableClock;
 
-import java.time.Clock;
-
 @Configuration
 public class TaskConfiguration {
     @Bean

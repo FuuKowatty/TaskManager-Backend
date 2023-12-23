@@ -21,7 +21,7 @@ import java.time.Clock;
 @Testcontainers
 public class BaseIntegrationTest {
     @Autowired
-    public Clock adjustableClock;
+    public Clock clock;
     @Autowired
     public MockMvc mockMvc;
     @Autowired

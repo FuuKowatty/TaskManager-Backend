@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.domain.task.TaskFacade;
-import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
+import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.domain.task.dto.UpdateTaskRequestDto;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 import pl.bartoszmech.infrastructure.task.TaskInfoResponseDto;
 
@@ -43,7 +42,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestBody @Valid CreateTaskRequestDto requestDto) {
+    public ResponseEntity<TaskDto> createTask(@RequestBody @Valid CreateAndUpdateTaskRequestDto requestDto) {
         authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(CREATED).body(taskFacade.createTask(requestDto));
     }
@@ -53,7 +52,7 @@ public class TaskController {
         return ResponseEntity.status(OK).body(taskFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> editTaskById(@PathVariable("id") long id, @RequestBody @Valid UpdateTaskRequestDto  requestDto) {
+    public ResponseEntity<TaskDto> editTaskById(@PathVariable("id") long id, @RequestBody @Valid CreateAndUpdateTaskRequestDto  requestDto) {
         authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
         return ResponseEntity.status(OK).body(taskFacade.updateTask(id, requestDto));
     }

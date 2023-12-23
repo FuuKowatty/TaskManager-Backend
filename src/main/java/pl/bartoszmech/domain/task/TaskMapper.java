@@ -10,7 +10,7 @@ class TaskMapper {
                 .id(savedTask.getId())
                 .title(savedTask.getTitle())
                 .description(savedTask.getDescription())
-                .isCompleted(savedTask.isCompleted())
+                .status(savedTask.getStatus())
                 .startDate(reducePrecisionToSeconds(savedTask.getStartDate()))
                 .endDate(reducePrecisionToSeconds(savedTask.getEndDate()))
                 .assignedTo(savedTask.getAssignedTo())
@@ -22,9 +22,10 @@ class TaskMapper {
                 taskDto.id(),
                 taskDto.title(),
                 taskDto.description(),
-                taskDto.isCompleted(),
+                taskDto.status(),
                 taskDto.startDate(),
                 taskDto.endDate(),
+                taskDto.completedAt(),
                 taskDto.assignedTo()
         );
     }
