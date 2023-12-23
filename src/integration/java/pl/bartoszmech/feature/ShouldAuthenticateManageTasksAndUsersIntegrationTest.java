@@ -7,7 +7,7 @@ import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
 
 import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
-import pl.bartoszmech.domain.task.dto.CreateTaskRequestDto;
+import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
@@ -34,7 +35,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
     public void should_authenticate_and_manage_tasks_if_user_has_permission() throws Exception {
         //SECURITY
         //Step 1: An admin user can log in to their account.
-        String adminEmail = "admin@gmail@gmail.com";
+        String adminEmail = "admin@gmail.com";
         String adminPassword = "zaq1@WSX";
         mockMvc.perform(post("/accounts/register")
                         .contentType(APPLICATION_JSON_VALUE)
@@ -59,7 +60,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
 
 
         //Step 2: A manager user can log in to their account.
-        String managerEmail = "manager@gmail@gmail.com";
+        String managerEmail = "manager@gmail.com";
         String managerPassword = "zaq1@WSX";
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
@@ -85,7 +86,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
 
 
         //Step 3: An employee user can log in to their account.
-        String employeeEmail = "employee@gmail@gmail.com";
+        String employeeEmail = "employee@gmail.com";
         String employeePassword = "zaq1@WSX";
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
@@ -148,10 +149,10 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         String createdTaskByAdminResponse = mockMvc.perform(post("/api/tasks")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateTaskRequestDto.builder()
                                 .title("created title by admin")
                                 .description("created description by admin")
-                                .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
+                                .endDate(LocalDateTime.now(clock).plusDays(1))
                                 .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isCreated())
@@ -163,10 +164,10 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         String createdTaskByManagerResponse = mockMvc.perform(post("/api/tasks")
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateTaskRequestDto.builder()
                                 .title("created title by manager")
                                 .description("created description by manager")
-                                .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
+                                .endDate(LocalDateTime.now(clock).plusDays(1))
                                 .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isCreated())
@@ -178,10 +179,10 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         mockMvc.perform(post("/api/tasks")
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateTaskRequestDto.builder()
                                 .title("tasktitle3")
                                 .description("taskdescription")
-                                .endDate(LocalDateTime.now(adjustableClock).plusDays(1))
+                                .endDate(LocalDateTime.now(clock).plusDays(1))
                                 .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isForbidden());
@@ -191,10 +192,10 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         mockMvc.perform(put("/api/tasks/" + createdTaskByAdmin.id())
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateTaskRequestDto.builder()
                                 .title("qtt3t3te")
                                 .description("tt3t3t3ff3")
-                                .endDate(LocalDateTime.now(adjustableClock).plusDays(2))
+                                .endDate(LocalDateTime.now(clock).plusDays(2))
                                 .assignedTo(createdTaskByManager.assignedTo())
                                 .build())))
                 .andExpect(status().isForbidden());
@@ -270,10 +271,10 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         String editedTaskByManagerResponse = mockMvc.perform(put("/api/tasks/" + createdTaskByManager.id())
                         .header("Authorization", "Bearer " + managerToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateTaskRequestDto.builder()
                                 .title("edited title by manager")
                                 .description("I was updated by manager")
-                                .endDate(LocalDateTime.now(adjustableClock).plusDays(2))
+                                .endDate(LocalDateTime.now(clock).plusDays(2))
                                 .assignedTo(adamEmployee.id())
                                 .build())))
                 .andExpect(status().isOk())
@@ -318,10 +319,10 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         String updatedTaskByAdminResponse = mockMvc.perform(put("/api/tasks/" + editedTaskByManager.id())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateTaskRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateTaskRequestDto.builder()
                                 .title("edited title by admin")
                                 .description("I was updated by admin")
-                                .endDate(LocalDateTime.now(adjustableClock).plusDays(2))
+                                .endDate(LocalDateTime.now(clock).plusDays(2))
                                 .assignedTo(danyEmployee.id())
                                 .build())))
                 .andExpect(status().isOk())
@@ -357,7 +358,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         });
 
         assertThat(deletedTask).isEqualTo(listTask.get(0));
-        assertThat(deletedTask.isCompleted()).isTrue();
+        assertThat(deletedTask.status()).isEqualTo(PENDING);
 
         //USER DOMAIN
         //Step 26: Employee cannot add a new user.
