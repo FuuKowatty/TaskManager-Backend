@@ -23,7 +23,7 @@ public record CreateUserRequestDto(
         String lastName,
         @NotNull(message = "{user.email.required}")
         @NotBlank(message = "{user.email.not.blank}")
-        @Pattern(regexp = "/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/", message = "{user.email.invalid}")
+        @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", message = "{user.email.invalid}")
         String email,
         @NotNull(message = "{user.password.required}")
         @NotBlank(message = "{user.password.not.blank}")
