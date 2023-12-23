@@ -79,12 +79,20 @@ class TaskService {
         ));
     }
 
+    List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(LocalDateTime taskEndDateRange) {
+        List<TaskDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
+        Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
+        return tasksByAssignedTo.entrySet().stream()
+                .map(entry -> new CompletedTasksByAssignedtoResponseDto(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
     private void validateIfTaskCanBeCreated(TaskDto inputTask) {
         checkIfStartDateIfBeforeEndDate(inputTask.startDate(), inputTask.endDate());
         checkIfUserHaveAlreadyThisTask(inputTask);
     }
 
-    public void checkIfUserHaveAlreadyThisTask(TaskDto inputTask) {
+     private void checkIfUserHaveAlreadyThisTask(TaskDto inputTask) {
         if(isTaskAssignedToSameUser(inputTask)) {
             throw new DuplicateUserTaskException(TASK_DUPLICATE);
         }
@@ -104,14 +112,6 @@ class TaskService {
                         task.assignedTo().equals(inputTask.assignedTo()));
     }
 
-    public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(LocalDateTime taskEndDateRange) {
-        List<TaskDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
-        Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
-        return tasksByAssignedTo.entrySet().stream()
-                .map(entry -> new CompletedTasksByAssignedtoResponseDto(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
-
     private List<TaskDto> getTasksFromLastSixMonths(LocalDateTime taskEndDateRange) {
         List<TaskDto> tasks = listTasks();
         return tasks.stream()
@@ -123,9 +123,5 @@ class TaskService {
         return tasks.stream()
                 .filter(task -> task.status() == COMPLETED)
                 .collect(Collectors.groupingBy(TaskDto::assignedTo, Collectors.summingInt(task -> 1)));
-    }
-
-    public void markAsFailedOutdatedTasks() {
-
     }
 }

@@ -235,7 +235,7 @@ public class UserFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = userFacade.createUser(CreateAndUpdateUserRequestDto
+        userFacade.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -298,7 +298,6 @@ public class UserFacadeTest {
         Throwable userNotFound = assertThrows(BadCredentialsException.class, () -> userFacade.findByEmail(nonExistingEmail));assertThrows(BadCredentialsException.class, () -> userFacade.findByEmail(nonExistingEmail));
         assertThat(userNotFound.getMessage()).isEqualTo("User with provided email could not be found");
     }
-    //create with role user without passing role
     @Test
     public void should_create_user_with_admin_role_without_passing_any_role() {
         //given

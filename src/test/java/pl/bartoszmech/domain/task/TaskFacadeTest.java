@@ -1,21 +1,21 @@
 package pl.bartoszmech.domain.task;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
+import pl.bartoszmech.infrastructure.clock.AdjustableClock;
 
 import java.time.*;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
 import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 public class TaskFacadeTest {
-    @Mock
-    private Clock clock = Clock.fixed(
+    private AdjustableClock clock = new AdjustableClock(
             LocalDateTime.of(2014, 12, 22, 10, 15, 30).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
     );
@@ -403,4 +403,55 @@ public class TaskFacadeTest {
         assertThat(updatedTask.status()).isEqualTo(TaskStatus.COMPLETED);
     }
 
+    @Test
+    public void should_list_only_employee_task() {
+        //given
+        long userId = 997L;
+        String title = "RandomTitle";
+        String description = "dnjfouwfofw2r21  rr 32r r32 r2 3";
+        TaskDto savedTask1 = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
+                .title(title)
+                .description(description)
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
+                .build());
+        TaskDto savedTask2 = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
+                .title(title + "to make originally title")
+                .description(description)
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId)
+                .build());
+        taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
+                .title(title)
+                .description(description)
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(userId+1)
+                .build());
+        //when
+        List<TaskDto> foundTasks = taskFacade.listEmployeeTasks(userId);
+        //then
+        assertThat(taskFacade.listEmployeeTasks(userId).size()).isEqualTo(2);
+        assertThat(foundTasks).containsExactlyInAnyOrder(
+                savedTask1,
+                savedTask2
+        );
+    }
+
+    @Test
+    public void should_mark_outdated_tasks_as_failed() {
+        //given
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
+                .title("RandomTitle")
+                .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
+                .endDate(LocalDateTime.now(clock).plusDays(1))
+                .assignedTo(997L)
+                .build());
+
+        //when
+        clock.plusDaysAndMinutes(1, 1);
+        taskFacade.markAsFailedOutdatedTasks();
+        //then
+        TaskDto updatedTask = taskFacade.findById(savedTask.id());
+        assertThat(updatedTask.status()).isEqualTo(FAILED);
+    }
 }
