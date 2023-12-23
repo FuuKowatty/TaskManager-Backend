@@ -10,11 +10,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 @Builder
-public record CreateTaskRequestDto(
+public record CreateAndUpdateTaskRequestDto(
         @NotNull(message = "{task.title.required}")
         @NotBlank(message = "{task.title.not.blank}")
         @Size(min = 3, message = "{task.title.too.short}")
-        @Size(min = 255, message = "{task.title.too.long}")
+        @Size(max = 255, message = "{task.title.too.long}")
         String title,
         @NotNull(message = "{task.description.required}")
         @NotBlank(message = "{task.description.not.blank}")
