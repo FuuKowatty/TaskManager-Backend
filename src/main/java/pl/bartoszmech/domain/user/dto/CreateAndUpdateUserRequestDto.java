@@ -8,7 +8,7 @@ import lombok.Builder;
 import pl.bartoszmech.domain.user.UserRoles;
 
 @Builder
-public record CreateUserRequestDto(
+public record CreateAndUpdateUserRequestDto(
         @NotNull(message = "{user.firstName.required}")
         @NotBlank(message = "{user.firstName.not.blank}")
         @Pattern(regexp = "^[a-zA-Z]+$", message = "{user.firstName.invalid}")

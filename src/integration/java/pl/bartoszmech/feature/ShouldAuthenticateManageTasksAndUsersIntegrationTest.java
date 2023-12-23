@@ -2,10 +2,14 @@ package pl.bartoszmech.feature;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 import pl.bartoszmech.BaseIntegrationTest;
-import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
 
-import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
@@ -26,7 +30,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
-import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
@@ -40,7 +43,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         String adminPassword = "zaq1@WSX";
         mockMvc.perform(post("/accounts/register")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
                                 .firstName("Dany")
                                 .lastName("Abramov")
                                 .email(adminEmail)
@@ -66,7 +69,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
                                 .firstName("Dany")
                                 .lastName("Abramov")
                                 .email(managerEmail)
@@ -92,7 +95,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
                                 .firstName("Dany")
                                 .lastName("Abramov")
                                 .email(employeeEmail)
@@ -105,7 +108,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
                                 .firstName("Adam")
                                 .lastName("Abramov")
                                 .email("employee2@gmail.com")
@@ -443,7 +446,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIn
         String updatedUserResponse = mockMvc.perform(put("/api/users/" + danyEmployee.id())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(UpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
                                 .firstName("Danny")
                                 .lastName("Daniels")
                                 .email("abc@gmail.com")

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.domain.user.UserFacade;
-import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
@@ -38,8 +38,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerAdmin(@RequestBody CreateUserRequestDto user) {
-        return ResponseEntity.status(CREATED).body(userFacade.registerAdmin(CreateUserRequestDto.builder()
+    public ResponseEntity<UserDto> registerAdmin(@RequestBody CreateAndUpdateUserRequestDto user) {
+        return ResponseEntity.status(CREATED).body(userFacade.registerAdmin(CreateAndUpdateUserRequestDto.builder()
                 .firstName(user.firstName())
                 .lastName(user.lastName())
                 .email(user.email())

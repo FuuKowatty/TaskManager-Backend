@@ -1,8 +1,7 @@
 package pl.bartoszmech.domain.user;
 
 import lombok.AllArgsConstructor;
-import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public class UserFacade {
     public UserDto findByEmail(String email) {
         return service.findByEmail(email);
     }
-    public UserDto createUser(CreateUserRequestDto inputUser) {
+    public UserDto createUser(CreateAndUpdateUserRequestDto inputUser) {
         service.checkIfEmailIsAlreadyUsed(inputUser.email());
         return service.createUser(inputUser);
     }
@@ -33,14 +32,14 @@ public class UserFacade {
         return service.findById(id);
     }
 
-    public UserDto updateUser(Long id, UpdateUserRequestDto userRequestDto) {
+    public UserDto updateUser(Long id, CreateAndUpdateUserRequestDto userRequestDto) {
         service.checkIfEmailIsAlreadyUsedByOtherUser(id, userRequestDto);
         return service.updateUser(id, userRequestDto);
     }
 
-    public UserDto registerAdmin(CreateUserRequestDto inputUser) {
+    public UserDto registerAdmin(CreateAndUpdateUserRequestDto inputUser) {
         service.checkIfEmailIsAlreadyUsed(inputUser.email());
-        return service.createUser(CreateUserRequestDto.builder()
+        return service.createUser(CreateAndUpdateUserRequestDto.builder()
                     .firstName(inputUser.firstName())
                     .lastName(inputUser.lastName())
                     .email(inputUser.email())

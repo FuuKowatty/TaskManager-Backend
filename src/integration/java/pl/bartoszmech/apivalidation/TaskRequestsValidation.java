@@ -17,8 +17,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TaskRequestsValidation extends BaseIntegrationTest {
-
-
     @Test
     @WithMockUser(authorities = "admin")
     public void should_return_bad_request_and_message_when_provide_invalid_task_credentials() throws Exception {

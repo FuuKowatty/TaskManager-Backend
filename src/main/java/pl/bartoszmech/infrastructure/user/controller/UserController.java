@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.domain.user.UserFacade;
-import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 import pl.bartoszmech.infrastructure.user.EmployeeStatisticDto;
@@ -45,9 +44,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@Valid @RequestBody CreateUserRequestDto requestDto) {
+    public ResponseEntity<UserDto> create(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(CREATED).body(userFacade.createUser(CreateUserRequestDto.builder()
+        return ResponseEntity.status(CREATED).body(userFacade.createUser(CreateAndUpdateUserRequestDto.builder()
                 .firstName(requestDto.firstName())
                 .lastName(requestDto.lastName())
                 .email(requestDto.email())
@@ -61,7 +60,7 @@ public class UserController {
         return ResponseEntity.status(OK).body(userFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody UpdateUserRequestDto requestDto) {
+    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 

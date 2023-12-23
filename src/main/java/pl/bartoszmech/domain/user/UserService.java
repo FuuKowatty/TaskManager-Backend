@@ -3,8 +3,7 @@ package pl.bartoszmech.domain.user;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-import pl.bartoszmech.domain.user.dto.CreateUserRequestDto;
-import pl.bartoszmech.domain.user.dto.UpdateUserRequestDto;
+import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 
@@ -23,7 +22,7 @@ class UserService {
         return UserMapper.mapFromUser(repository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException(USER_NOT_FOUND_BY_EMAIL)));
     }
-    UserDto createUser(CreateUserRequestDto inputUser) {
+    UserDto createUser(CreateAndUpdateUserRequestDto inputUser) {
         User savedUser = repository.save(new User(
                     inputUser.firstName(),
                     inputUser.lastName(),
@@ -54,7 +53,7 @@ class UserService {
         return deletedUser;
     }
 
-    UserDto updateUser(Long id, UpdateUserRequestDto inputUser) {
+    UserDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
         return UserMapper.mapFromUser(repository.save(new User(
                 id,
@@ -66,7 +65,7 @@ class UserService {
         )));
     }
 
-    void checkIfEmailIsAlreadyUsedByOtherUser(Long id, UpdateUserRequestDto userRequestDto) {
+    void checkIfEmailIsAlreadyUsedByOtherUser(Long id, CreateAndUpdateUserRequestDto userRequestDto) {
         if(!findById(id).email().equals(userRequestDto.email())  && repository.existsByEmail(userRequestDto.email())) {
             throw new EmailTakenException(EMAIL_TAKEN);
         }
