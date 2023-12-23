@@ -9,6 +9,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
+import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
 import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @AllArgsConstructor
@@ -63,7 +65,7 @@ public class TaskFacade {
     }
 
     public void completeTask(long id) {
-        taskService.completeTask(id, getNow());
+        taskService.markTaskAs(COMPLETED, id, getNow());
     }
 
     public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
@@ -75,4 +77,11 @@ public class TaskFacade {
         return LocalDateTime.now(clock);
     }
 
+    public void markAsFailedOutdatedTasks() {
+        LocalDateTime checkedDateTime = getNow();
+        taskService.listTasks()
+                .stream()
+                .filter(task -> task.status() == PENDING && task.endDate().isBefore(checkedDateTime))
+                .forEach(task -> taskService.markTaskAs(FAILED, task.id(), checkedDateTime));
+    }
 }

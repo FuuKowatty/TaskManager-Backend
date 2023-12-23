@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
-import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
 import pl.bartoszmech.domain.task.dto.CompletedTasksByAssignedtoResponseDto;
 
@@ -14,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
+import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @AllArgsConstructor
 @Service
@@ -65,13 +65,13 @@ class TaskService {
         )));
     }
 
-    void completeTask(long id, LocalDateTime completedAt) {
+    void markTaskAs(TaskStatus status,long id, LocalDateTime completedAt) {
         TaskDto foundTask = findById(id);
         repository.save(new Task(
                 foundTask.id(),
                 foundTask.title(),
                 foundTask.description(),
-                COMPLETED,
+                status,
                 foundTask.startDate(),
                 foundTask.endDate(),
                 completedAt,
@@ -123,5 +123,9 @@ class TaskService {
         return tasks.stream()
                 .filter(task -> task.status() == COMPLETED)
                 .collect(Collectors.groupingBy(TaskDto::assignedTo, Collectors.summingInt(task -> 1)));
+    }
+
+    public void markAsFailedOutdatedTasks() {
+
     }
 }
