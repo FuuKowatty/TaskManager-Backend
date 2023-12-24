@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
-import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @AllArgsConstructor
 @Service

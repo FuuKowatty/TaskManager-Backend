@@ -1,13 +1,7 @@
 package pl.bartoszmech.apivalidation;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
 import pl.bartoszmech.BaseIntegrationTest;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
 

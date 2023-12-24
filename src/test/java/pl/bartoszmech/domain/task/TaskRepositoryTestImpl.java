@@ -6,14 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
 
 public class TaskRepositoryTestImpl implements TaskRepository{
     ConcurrentHashMap<Long, Task> database = new ConcurrentHashMap<>();
