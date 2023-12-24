@@ -40,6 +40,7 @@ class Task {
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.completedAt = completedAt;
         this.assignedTo = assignedTo;
     }
 
@@ -51,6 +52,20 @@ class Task {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return Objects.equals(id, task.id) && Objects.equals(title, task.title) && Objects.equals(description, task.description) && status == task.status && Objects.equals(startDate, task.startDate) && Objects.equals(endDate, task.endDate) && Objects.equals(assignedTo, task.assignedTo);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", completedAt=" + completedAt +
+                ", assignedTo=" + assignedTo +
+                '}';
     }
 
     @Override
