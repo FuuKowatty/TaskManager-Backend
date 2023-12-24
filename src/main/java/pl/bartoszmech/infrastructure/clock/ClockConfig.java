@@ -4,15 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
 
 @Configuration
 public class ClockConfig {
     @Bean
-    public AdjustableClock adjustableClock() {
-        Instant initialInstant = Instant.now();
-        ZoneId zone = ZoneId.systemDefault();
-        return new AdjustableClock(initialInstant, zone);
+    public Clock systemDefaultZoneClock() {
+        return Clock.systemDefaultZone();
     }
 }
