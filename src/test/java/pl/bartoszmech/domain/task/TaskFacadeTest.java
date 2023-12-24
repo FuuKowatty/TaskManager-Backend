@@ -4,18 +4,23 @@ import org.junit.jupiter.api.Test;
 import pl.bartoszmech.domain.shared.ResourceNotFound;
 import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.domain.task.dto.TaskDto;
-import pl.bartoszmech.infrastructure.clock.AdjustableClock;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
 import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
 import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 public class TaskFacadeTest {
-    private AdjustableClock clock = new AdjustableClock(
+    private final AdjustableClock clock = new AdjustableClock(
             LocalDateTime.of(2014, 12, 22, 10, 15, 30).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
     );
@@ -397,11 +402,52 @@ public class TaskFacadeTest {
                 .assignedTo(997L)
                 .build());
         //when
-        taskFacade.completeTask(savedTask.id());
+        String message = taskFacade.completeTask(savedTask.id());
         //then
         TaskDto updatedTask = taskFacade.findById(savedTask.id());
-        assertThat(updatedTask.status()).isEqualTo(TaskStatus.COMPLETED);
+        assertThat(updatedTask.status()).isEqualTo(COMPLETED);
+        assertThat(message).isEqualTo("Task successfully completed");
+        assertThat(updatedTask.completedAt()).isEqualTo(LocalDateTime.now(clock));
     }
+
+    @Test
+    public void should_return_task_already_completed_message_when_trying_complete_completed_task() {
+        //given
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
+                .title("RandomTitle")
+                .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(997L)
+                .build());
+        taskFacade.completeTask(savedTask.id());
+        //when
+        String message = taskFacade.completeTask(savedTask.id());
+        //then
+        TaskDto updatedTask = taskFacade.findById(savedTask.id());
+        assertThat(updatedTask.status()).isEqualTo(COMPLETED);
+        assertThat(message).isEqualTo("Task is already completed");
+    }
+
+    @Test
+    public void should_return_task_already_failed_message_when_trying_complete_failed_task() {
+        //given
+        TaskDto savedTask = taskFacade.createTask(CreateAndUpdateTaskRequestDto.builder()
+                .title("RandomTitle")
+                .description("dnjfouwfofw2r21  rr 32r r32 r2 3")
+                .endDate(LocalDateTime.now(clock).plusSeconds(1))
+                .assignedTo(997L)
+                .build());
+        clock.advanceInTimeBy(Duration.ofSeconds(2));
+        taskFacade.markAsFailedOutdatedTasks();
+        //when
+        String message = taskFacade.completeTask(savedTask.id());
+        //then
+        TaskDto updatedTask = taskFacade.findById(savedTask.id());
+        assertThat(updatedTask.status()).isEqualTo(FAILED);
+        assertThat(message).isEqualTo("Task is outdated");
+        assertThat(updatedTask.completedAt()).isNull();
+    }
+
 
     @Test
     public void should_list_only_employee_task() {
