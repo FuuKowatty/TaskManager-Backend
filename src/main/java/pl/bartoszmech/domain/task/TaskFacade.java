@@ -15,6 +15,10 @@ import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @AllArgsConstructor
 public class TaskFacade {
+    public static final String TASK_SUCCESSFULLY_COMPLETED = "Task successfully completed";
+    public static final String TASK_IS_OUTDATED = "Task is outdated";
+    public static final String TASK_IS_ALREADY_COMPLETED = "Task is already completed";
+
     private final TaskService taskService;
     private final Clock clock;
 
@@ -64,8 +68,16 @@ public class TaskFacade {
                 .toList();
     }
 
-    public void completeTask(long id) {
-        taskService.markTaskAs(COMPLETED, id, getNow());
+    public String completeTask(long id) {
+        TaskDto task = taskService.findById(id);
+        if (task.status().equals(PENDING)) {
+            taskService.markTaskAs(COMPLETED, id, getNow());
+            return TASK_SUCCESSFULLY_COMPLETED;
+        }
+        if (task.endDate().isBefore(getNow())) {
+            return TASK_IS_OUTDATED;
+        }
+        return TASK_IS_ALREADY_COMPLETED;
     }
 
     public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
@@ -82,7 +94,7 @@ public class TaskFacade {
         taskService.listTasks()
                 .stream()
                 .filter(task -> task.status() == PENDING && task.endDate().isBefore(checkedDateTime))
-                .forEach(task -> taskService.markTaskAs(FAILED, task.id(), checkedDateTime));
+                .forEach(task -> taskService.markTaskAs(FAILED, task.id(), null));
     }
 
 

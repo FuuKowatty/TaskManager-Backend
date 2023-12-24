@@ -27,7 +27,6 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/tasks")
 @AllArgsConstructor
 public class TaskController {
-    public static final String TASK_COMPLETED = "Task completed";
     private final TaskFacade taskFacade;
     private final AuthorizationService authorizationService;
     @GetMapping
@@ -66,8 +65,8 @@ public class TaskController {
     @PatchMapping("/{id}/complete")
     public ResponseEntity<TaskInfoResponseDto> completeTask(@PathVariable("id") long id) {
         findTaskAndCheckIfEmployeeHasPermission(id);
-        taskFacade.completeTask(id);
-        return ResponseEntity.status(OK).body(new TaskInfoResponseDto(TASK_COMPLETED));
+        String messageStatus = taskFacade.completeTask(id);
+        return ResponseEntity.status(OK).body(new TaskInfoResponseDto(messageStatus));
     }
 
     private TaskDto findTaskAndCheckIfEmployeeHasPermission(long id) {
