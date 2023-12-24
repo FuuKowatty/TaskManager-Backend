@@ -65,7 +65,7 @@ class TaskService {
         )));
     }
 
-    void markTaskAs(TaskStatus status,long id, LocalDateTime completedAt) {
+    void markTaskAs(TaskStatus status, long id, LocalDateTime completedAt) {
         TaskDto foundTask = findById(id);
         repository.save(new Task(
                 foundTask.id(),

@@ -13,6 +13,7 @@ class TaskMapper {
                 .status(savedTask.getStatus())
                 .startDate(reducePrecisionToSeconds(savedTask.getStartDate()))
                 .endDate(reducePrecisionToSeconds(savedTask.getEndDate()))
+                .completedAt(savedTask.getCompletedAt())
                 .assignedTo(savedTask.getAssignedTo())
                 .build();
     }

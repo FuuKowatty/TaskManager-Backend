@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -23,18 +24,18 @@ public class TaskRepositoryTestImpl implements TaskRepository{
             Random random = new Random();
             long id = random.nextLong();
             Task task = new Task(id, entity.getTitle(), entity.getDescription(), entity.getStatus(), entity.getStartDate()
-                    ,entity.getEndDate(), entity.getCompletedAt(), entity.getAssignedTo());
+                    ,entity.getEndDate(), null, entity.getAssignedTo());
             database.put(id, task);
             return task;
         }
         Task task = new Task(entity.getId(), entity.getTitle(), entity.getDescription(), entity.getStatus(), entity.getStartDate()
                 ,entity.getEndDate(), entity.getCompletedAt(),entity.getAssignedTo());
         database.replace(entity.getId(), task);
-        return task;
+        return database.get(entity.getId());
     }
     @Override
     public Optional<Task> findById(Long id) {
-        return database.values().stream().filter(task -> task.getId().equals(id)).findFirst();
+        return Optional.ofNullable(database.get(id));
     }
 
     @Override
