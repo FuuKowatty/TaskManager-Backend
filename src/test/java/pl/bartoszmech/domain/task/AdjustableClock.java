@@ -1,4 +1,4 @@
-package pl.bartoszmech.infrastructure.clock;
+package pl.bartoszmech.domain.task;
 
 import java.time.Clock;
 import java.time.Duration;
