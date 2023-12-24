@@ -1,5 +1,6 @@
 package pl.bartoszmech.infrastructure.security.jwt;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -13,7 +14,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
-import pl.bartoszmech.infrastructure.clock.AdjustableClock;
 
 
 @AllArgsConstructor
@@ -21,7 +21,7 @@ import pl.bartoszmech.infrastructure.clock.AdjustableClock;
 public class JwtAuthenticatorFacade {
 
     private final AuthenticationManager authenticationManager;
-    private final AdjustableClock clock;
+    private final Clock clock;
     private final JwtConfigurationProperties properties;
 
     public JwtResponseDto authenticateAndGenerateToken(TokenRequestDto loginRequest) {
