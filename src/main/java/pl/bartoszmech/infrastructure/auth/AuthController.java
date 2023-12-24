@@ -1,5 +1,6 @@
 package pl.bartoszmech.infrastructure.auth;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +28,7 @@ public class AuthController {
     private final UserFacade userFacade;
     PasswordEncoder passwordEncoder;
     @PostMapping("/token")
-    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@RequestBody TokenRequestDto tokenRequestDto) {
+    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorFacade.authenticateAndGenerateToken(tokenRequestDto);
         String email = jwtDto.username();
         return ResponseEntity.status(OK).body(TokenResponseDto.builder()
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerAdmin(@RequestBody CreateAndUpdateUserRequestDto user) {
+    public ResponseEntity<UserDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
         return ResponseEntity.status(CREATED).body(userFacade.registerAdmin(CreateAndUpdateUserRequestDto.builder()
                 .firstName(user.firstName())
                 .lastName(user.lastName())
