@@ -10,7 +10,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UserRequestValidation extends BaseIntegrationTest {
+public class UserRequestValidationIntegrationTest extends BaseIntegrationTest {
     @Test
     @WithMockUser(authorities = "admin")
     public void should_return_bad_request_and_message_when_provide_invalid_user_credentials() throws Exception {
