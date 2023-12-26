@@ -30,7 +30,7 @@ The application is based on a modular monolith with hexagonal architecture, so w
 | `/api/users/{id}`                                         |  `PUT`   | JSON BODY (firstName, LastName, email, password, role)                                     | JSON BODY (UserDto)               | update user's data                                      | ADMIN                                        |
 | `/api/users/{id}`                                         |  `GET`   | -                                                                                          | JSON BODY (UserDto)               | show user by id                                         | ADMIN                                        |
 | `/api/users/{id}`                                         | `DELETE` | -                                                                                          | JSON BODY (UserDto)               | delete user by id                                       | ADMIN                                        |
-| `/api/users/stats/sorted-by-completed-tasks?lastMonths=1` |  `GET`   | -                                                                                          | JSON(List<EmployeeStatisticsDto>) | show how many tasks each user completed in `lastMonths` |                                              |
+| `/api/users/stats/sorted-by-completed-tasks?lastMonths=1` |  `GET`   | -                                                                                          | JSON(List<EmployeeStatisticsDto>) | show how many tasks each user completed in `lastMonths` | ADMIN, MANAGER                               |
 
 
 ## Technologies
