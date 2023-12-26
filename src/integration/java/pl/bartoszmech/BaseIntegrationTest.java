@@ -1,6 +1,8 @@
 package pl.bartoszmech;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,10 +17,9 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
 
-@SpringBootTest(classes = TaskManager.class)
+@SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
-@Testcontainers
 public class BaseIntegrationTest {
     @Autowired
     public Clock clock;
@@ -27,7 +28,12 @@ public class BaseIntegrationTest {
     @Autowired
     public ObjectMapper objectMapper;
     @Container
-    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.1"));
+    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.1"))
+            .withReuse(true);
+    @BeforeAll
+    static void setup() {
+        postgresContainer.start();
+    }
     @DynamicPropertySource
     public static void registerPgProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);

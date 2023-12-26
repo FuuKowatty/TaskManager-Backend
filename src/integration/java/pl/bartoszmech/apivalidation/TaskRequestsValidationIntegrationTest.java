@@ -25,7 +25,6 @@ public class TaskRequestsValidationIntegrationTest extends BaseIntegrationTest {
                                 """.trim())
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest());
-
         String responseWhenPassingEmptyObject = mockMvc.perform(post("/api/tasks")
                         .content("""
                                 {
