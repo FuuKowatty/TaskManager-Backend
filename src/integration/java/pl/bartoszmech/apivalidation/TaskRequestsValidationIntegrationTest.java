@@ -1,16 +1,31 @@
 package pl.bartoszmech.apivalidation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
-import pl.bartoszmech.BaseIntegrationTest;
+import org.springframework.test.web.servlet.MockMvc;
+import pl.bartoszmech.IntegrationTest;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
+
+import java.time.Clock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TaskRequestsValidationIntegrationTest extends BaseIntegrationTest {
+@IntegrationTest
+@AutoConfigureMockMvc
+public class TaskRequestsValidationIntegrationTest{
+
+    @Autowired
+    public Clock clock;
+    @Autowired
+    public MockMvc mockMvc;
+    @Autowired
+    public ObjectMapper objectMapper;
     @Test
     @WithMockUser(authorities = "admin")
     public void should_return_bad_request_and_message_when_provide_invalid_task_credentials() throws Exception {

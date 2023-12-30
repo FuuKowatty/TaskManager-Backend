@@ -1,8 +1,13 @@
 package pl.bartoszmech.feature;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import pl.bartoszmech.BaseIntegrationTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.MockMvc;
+import pl.bartoszmech.IntegrationTest;
 import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
 
 import pl.bartoszmech.domain.user.dto.UserDto;
@@ -12,6 +17,7 @@ import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenResponseDto;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,7 +35,16 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
-public class ShouldAuthenticateManageTasksAndUsersIntegrationTest extends BaseIntegrationTest {
+@IntegrationTest
+@AutoConfigureMockMvc
+public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
+
+    @Autowired
+    public Clock clock;
+    @Autowired
+    public MockMvc mockMvc;
+    @Autowired
+    public ObjectMapper objectMapper;
     @Test
     public void should_authenticate_and_manage_tasks_if_user_has_permission() throws Exception {
         //SECURITY
