@@ -1,7 +1,6 @@
 package pl.bartoszmech;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,12 +11,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class BaseIntegrationTest {
@@ -28,16 +26,13 @@ public class BaseIntegrationTest {
     @Autowired
     public ObjectMapper objectMapper;
     @Container
-    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.1"))
+        public final static PostgreSQLContainer<?> POSTGRESQL_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.1"))
             .withReuse(true);
-    @BeforeAll
-    static void setup() {
-        postgresContainer.start();
-    }
-    @DynamicPropertySource
-    public static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgresContainer::getUsername);
-        registry.add("spring.datasource.password", postgresContainer::getPassword);
+    static {
+        POSTGRESQL_CONTAINER.start();
+
+        System.setProperty("spring.datasource.url", POSTGRESQL_CONTAINER.getJdbcUrl());
+        System.setProperty("spring.datasource.username", POSTGRESQL_CONTAINER.getUsername());
+        System.setProperty("spring.datasource.password", POSTGRESQL_CONTAINER.getPassword());
     }
 }
