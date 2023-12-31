@@ -1,4 +1,4 @@
-package pl.bartoszmech.domain.task.dto;
+package pl.bartoszmech.application.response;
 
 import lombok.Builder;
 import pl.bartoszmech.domain.task.TaskStatus;
@@ -6,7 +6,7 @@ import pl.bartoszmech.domain.task.TaskStatus;
 import java.time.LocalDateTime;
 
 @Builder
-public record TaskDto(
+public record TaskResponseDto(
         Long id,
         String title,
         String description,

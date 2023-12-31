@@ -1,7 +1,7 @@
 package pl.bartoszmech.domain.task;
 
 public class DuplicateUserTaskException extends RuntimeException{
-    DuplicateUserTaskException(String message) {
+    public DuplicateUserTaskException(String message) {
         super(message);
     }
 }

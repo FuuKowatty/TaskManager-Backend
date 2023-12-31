@@ -1,28 +1,36 @@
-package pl.bartoszmech.domain.user;
+package pl.bartoszmech.domain.user.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.stereotype.Service;
-import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.domain.user.EmailTakenException;
+import pl.bartoszmech.domain.user.User;
+import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.dto.UserDto;
-import pl.bartoszmech.domain.shared.ResourceNotFound;
+import pl.bartoszmech.domain.user.repository.UserRepository;
+import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 
 import java.util.List;
 
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+
 @AllArgsConstructor
-@Service
-class UserService {
+public class UserServiceImpl implements UserService {
     private static final String EMAIL_TAKEN = "User email is taken";
     private static final String USER_NOT_FOUND = "User with provided id could not be found";
     private static final String USER_NOT_FOUND_BY_EMAIL = "User with provided email could not be found";
 
     private final UserRepository repository;
 
-    UserDto findByEmail(String email) {
+    @Override
+    public UserDto findByEmail(String email) {
         return UserMapper.mapFromUser(repository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException(USER_NOT_FOUND_BY_EMAIL)));
     }
-    UserDto createUser(CreateAndUpdateUserRequestDto inputUser) {
+
+    @Override
+    public UserDto createUser(CreateAndUpdateUserRequestDto inputUser) {
+        checkIfEmailIsAlreadyUsed(inputUser.email());
         User savedUser = repository.save(new User(
                     inputUser.firstName(),
                     inputUser.lastName(),
@@ -33,7 +41,8 @@ class UserService {
         return UserMapper.mapFromUser(savedUser);
     }
 
-    List<UserDto> listUsers() {
+    @Override
+    public List<UserDto> listUsers() {
         return repository
                 .findAll()
                 .stream()
@@ -41,19 +50,22 @@ class UserService {
                 .toList();
     }
 
-    UserDto findById(Long id) {
+    @Override
+    public UserDto findById(Long id) {
         User foundUser = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
         return UserMapper.mapFromUser(foundUser);
     }
 
-    UserDto deleteById(Long id) {
+    @Override
+    public UserDto deleteById(Long id) {
         UserDto deletedUser = findById(id);
         repository.deleteById(id);
         return deletedUser;
     }
 
-    UserDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
+    @Override
+    public UserDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
         return UserMapper.mapFromUser(repository.save(new User(
                 id,
@@ -65,13 +77,25 @@ class UserService {
         )));
     }
 
-    void checkIfEmailIsAlreadyUsedByOtherUser(Long id, CreateAndUpdateUserRequestDto userRequestDto) {
+    @Override
+    public UserDto registerAdmin(CreateAndUpdateUserRequestDto inputUser) {
+        checkIfEmailIsAlreadyUsed(inputUser.email());
+        return createUser(CreateAndUpdateUserRequestDto.builder()
+                .firstName(inputUser.firstName())
+                .lastName(inputUser.lastName())
+                .email(inputUser.email())
+                .password(inputUser.password())
+                .role(ADMIN)
+                .build());
+    }
+
+    private void checkIfEmailIsAlreadyUsedByOtherUser(Long id, CreateAndUpdateUserRequestDto userRequestDto) {
         if(!findById(id).email().equals(userRequestDto.email())  && repository.existsByEmail(userRequestDto.email())) {
             throw new EmailTakenException(EMAIL_TAKEN);
         }
     }
 
-    void checkIfEmailIsAlreadyUsed(String email) {
+    private void checkIfEmailIsAlreadyUsed(String email) {
         if(repository.existsByEmail(email)) {
             throw new EmailTakenException(EMAIL_TAKEN);
         }

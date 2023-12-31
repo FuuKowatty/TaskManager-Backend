@@ -1,4 +1,4 @@
-package pl.bartoszmech.infrastructure.user.controller;
+package pl.bartoszmech.application.rest;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.domain.user.UserFacade;
-import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
+import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 import pl.bartoszmech.infrastructure.user.EmployeeStatisticDto;
 import pl.bartoszmech.infrastructure.user.EmployeeStatisticService;
@@ -29,7 +29,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
-    UserFacade userFacade;
+    UserService userFacade;
     AuthorizationService authorizationService;
     PasswordEncoder passwordEncoder;
     EmployeeStatisticService employeeStatisticService;

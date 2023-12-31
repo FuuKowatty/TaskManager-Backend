@@ -17,7 +17,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Entity
 @Table(name = "tasks")
-class Task {
+public class Task {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.domain.user.UserFacade;
-import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
+import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenResponseDto;
@@ -25,7 +25,7 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 @AllArgsConstructor
 public class AuthController {
     private final JwtAuthenticatorFacade jwtAuthenticatorFacade;
-    private final UserFacade userFacade;
+    private final UserService userService;
     PasswordEncoder passwordEncoder;
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
@@ -34,13 +34,13 @@ public class AuthController {
         return ResponseEntity.status(OK).body(TokenResponseDto.builder()
                 .token(jwtDto.token())
                 .email(email)
-                .id(userFacade.findByEmail(email).id())
+                .id(userService.findByEmail(email).id())
                 .build());
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
-        return ResponseEntity.status(CREATED).body(userFacade.registerAdmin(CreateAndUpdateUserRequestDto.builder()
+        return ResponseEntity.status(CREATED).body(userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
                 .firstName(user.firstName())
                 .lastName(user.lastName())
                 .email(user.email())

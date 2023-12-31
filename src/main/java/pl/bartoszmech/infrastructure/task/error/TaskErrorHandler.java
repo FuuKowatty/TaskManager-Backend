@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import pl.bartoszmech.domain.shared.ResourceNotFound;
+import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import pl.bartoszmech.infrastructure.task.TaskInfoResponseDto;
 
 

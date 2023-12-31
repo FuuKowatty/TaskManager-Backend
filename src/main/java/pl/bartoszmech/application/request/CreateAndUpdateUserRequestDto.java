@@ -1,4 +1,4 @@
-package pl.bartoszmech.domain.user.dto;
+package pl.bartoszmech.application.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

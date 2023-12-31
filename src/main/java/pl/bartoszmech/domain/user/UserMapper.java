@@ -2,8 +2,8 @@ package pl.bartoszmech.domain.user;
 
 import pl.bartoszmech.domain.user.dto.UserDto;
 
-class UserMapper {
-    static UserDto mapFromUser(User savedTask) {
+public class UserMapper {
+    public static UserDto mapFromUser(User savedTask) {
         return UserDto
                 .builder()
                 .id(savedTask.getId())

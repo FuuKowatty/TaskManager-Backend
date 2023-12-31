@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import pl.bartoszmech.domain.user.UserFacade;
 import pl.bartoszmech.domain.user.UserRoles;
 import pl.bartoszmech.domain.user.dto.UserDto;
+import pl.bartoszmech.domain.user.service.UserService;
 
 import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
@@ -19,7 +19,7 @@ public class AuthorizationService {
     private static final String ADMIN_CREATION_NOT_ALLOWED = "Admin cannot create other admin, please authenticate via valid endpoint";
     public static final String EMPLOYEE_TRYING_READ_NOT_HIS_TASKS = "You dont have permission to read tasks of employee with id: ";
 
-    UserFacade userFacade;
+    UserService userService;
     public void hasUserPermissionToReadTaskWithId(long taskId,  long assignedTo) {
         UserDto user = findAuthenticatedUser();
         if (user.role().equals(EMPLOYEE) && assignedTo != user.id()) {
@@ -35,7 +35,7 @@ public class AuthorizationService {
     }
 
     public void checkIfTaskAssignedToEmployee(Long assignedTo) {
-        UserRoles role = userFacade.findById(assignedTo).role();
+        UserRoles role = userService.findById(assignedTo).role();
         if(!role.equals(EMPLOYEE)) {
             throw new UnauthorizedAccessException(TASK_NOT_ASSIGNED_TO_EMPLOYEE + role.getRoleName());
         }
@@ -49,7 +49,6 @@ public class AuthorizationService {
 
     private UserDto findAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDto user = userFacade.findByEmail(auth.getName());
-        return user;
+        return userService.findByEmail(auth.getName());
     }
 }

@@ -1,4 +1,4 @@
-package pl.bartoszmech.infrastructure.task.controller;
+package pl.bartoszmech.application.rest;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.domain.task.TaskFacade;
-import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
-import pl.bartoszmech.domain.task.dto.TaskDto;
+import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
+import pl.bartoszmech.application.response.TaskResponseDto;
+import pl.bartoszmech.domain.task.service.TaskService;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 import pl.bartoszmech.infrastructure.task.TaskInfoResponseDto;
 
@@ -27,50 +27,50 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/tasks")
 @AllArgsConstructor
 public class TaskController {
-    private final TaskFacade taskFacade;
+    private final TaskService taskService;
     private final AuthorizationService authorizationService;
     @GetMapping
-    public ResponseEntity<List<TaskDto>> listTasks() {
-        return ResponseEntity.status(OK).body(taskFacade.listTasks());
+    public ResponseEntity<List<TaskResponseDto>> listTasks() {
+        return ResponseEntity.status(OK).body(taskService.listTasks());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> findTaskById(@PathVariable("id") long id) {
-        TaskDto task = findTaskAndCheckIfEmployeeHasPermission(id);
+    public ResponseEntity<TaskResponseDto> findTaskById(@PathVariable("id") long id) {
+        TaskResponseDto task = findTaskAndCheckIfEmployeeHasPermission(id);
         return ResponseEntity.status(OK).body(task);
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestBody @Valid CreateAndUpdateTaskRequestDto requestDto) {
+    public ResponseEntity<TaskResponseDto> createTask(@RequestBody @Valid CreateAndUpdateTaskRequestDto requestDto) {
         authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
-        return ResponseEntity.status(CREATED).body(taskFacade.createTask(requestDto));
+        return ResponseEntity.status(CREATED).body(taskService.createTask(requestDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskDto> deleteTaskById(@PathVariable("id") long id) {
-        return ResponseEntity.status(OK).body(taskFacade.deleteById(id));    }
+    public ResponseEntity<TaskResponseDto> deleteTaskById(@PathVariable("id") long id) {
+        return ResponseEntity.status(OK).body(taskService.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> editTaskById(@PathVariable("id") long id, @RequestBody @Valid CreateAndUpdateTaskRequestDto  requestDto) {
+    public ResponseEntity<TaskResponseDto> editTaskById(@PathVariable("id") long id, @RequestBody @Valid CreateAndUpdateTaskRequestDto  requestDto) {
         authorizationService.checkIfTaskAssignedToEmployee(requestDto.assignedTo());
-        return ResponseEntity.status(OK).body(taskFacade.updateTask(id, requestDto));
+        return ResponseEntity.status(OK).body(taskService.updateTask(id, requestDto));
     }
 
     @GetMapping("/employee/{userId}")
-    public ResponseEntity<List<TaskDto>> listEmployeeTasks(@PathVariable("userId") long id) {
+    public ResponseEntity<List<TaskResponseDto>> listEmployeeTasks(@PathVariable("userId") long id) {
         authorizationService.hasUserPermissionToReadTasksOfEmployee(id);
-        return ResponseEntity.status(OK).body(taskFacade.listEmployeeTasks(id));
+        return ResponseEntity.status(OK).body(taskService.listEmployeeTasks(id));
     }
 
     @PatchMapping("/{id}/complete")
     public ResponseEntity<TaskInfoResponseDto> completeTask(@PathVariable("id") long id) {
         findTaskAndCheckIfEmployeeHasPermission(id);
-        String messageStatus = taskFacade.completeTask(id);
+        String messageStatus = taskService.completeTask(id);
         return ResponseEntity.status(OK).body(new TaskInfoResponseDto(messageStatus));
     }
 
-    private TaskDto findTaskAndCheckIfEmployeeHasPermission(long id) {
-        TaskDto task = taskFacade.findById(id);
+    private TaskResponseDto findTaskAndCheckIfEmployeeHasPermission(long id) {
+        TaskResponseDto task = taskService.findById(id);
         authorizationService.hasUserPermissionToReadTaskWithId(id, task.assignedTo());
         return task;
     }

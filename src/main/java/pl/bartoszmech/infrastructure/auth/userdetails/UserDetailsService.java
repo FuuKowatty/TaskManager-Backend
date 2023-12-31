@@ -4,19 +4,19 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.bartoszmech.domain.user.UserFacade;
 import pl.bartoszmech.domain.user.dto.UserDto;
+import pl.bartoszmech.domain.user.service.UserService;
 
 import java.util.List;
 
 @AllArgsConstructor
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
-    private final UserFacade userFacade;
+    private final UserService service;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws BadCredentialsException {
-        UserDto userDto = userFacade.findByEmail(username);
+        UserDto userDto = service.findByEmail(username);
         return getUser(userDto);
     }
 

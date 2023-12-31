@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.bartoszmech.IntegrationTest;
-import pl.bartoszmech.domain.user.dto.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 
 import pl.bartoszmech.domain.user.dto.UserDto;
-import pl.bartoszmech.domain.task.dto.CreateAndUpdateTaskRequestDto;
-import pl.bartoszmech.domain.task.dto.TaskDto;
+import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
+import pl.bartoszmech.application.response.TaskResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
 import pl.bartoszmech.infrastructure.auth.dto.TokenResponseDto;
@@ -171,7 +170,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                                 .build())))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto createdTaskByAdmin = objectMapper.readValue(createdTaskByAdminResponse, TaskDto.class);
+        TaskResponseDto createdTaskByAdmin = objectMapper.readValue(createdTaskByAdminResponse, TaskResponseDto.class);
 
 
         //Step 6: Manager can create a new task.
@@ -186,7 +185,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                                 .build())))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto createdTaskByManager = objectMapper.readValue(createdTaskByManagerResponse, TaskDto.class);
+        TaskResponseDto createdTaskByManager = objectMapper.readValue(createdTaskByManagerResponse, TaskResponseDto.class);
 
 
         //Step 7: Employee cannot create a new task.
@@ -235,7 +234,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<TaskDto> adminListTask = objectMapper.readValue(adminListTasksResponse, new TypeReference<>() {
+        List<TaskResponseDto> adminListTask = objectMapper.readValue(adminListTasksResponse, new TypeReference<>() {
         });
 
 
@@ -245,7 +244,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<TaskDto> managerListTask = objectMapper.readValue(managerListTasksResponse, new TypeReference<>() {
+        List<TaskResponseDto> managerListTask = objectMapper.readValue(managerListTasksResponse, new TypeReference<>() {
         });
 
         assertThat(adminListTask).isNotEmpty();
@@ -293,7 +292,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                                 .build())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto editedTaskByManager = objectMapper.readValue(editedTaskByManagerResponse, TaskDto.class);
+        TaskResponseDto editedTaskByManager = objectMapper.readValue(editedTaskByManagerResponse, TaskResponseDto.class);
 
         mockMvc.perform(get("/api/tasks/" + editedTaskByManager.id())
                         .header("Authorization", "Bearer " + employeeToken)
@@ -341,7 +340,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                                 .build())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto updatedTaskByAdmin = objectMapper.readValue(updatedTaskByAdminResponse, TaskDto.class);
+        TaskResponseDto updatedTaskByAdmin = objectMapper.readValue(updatedTaskByAdminResponse, TaskResponseDto.class);
 
 
         // Step 23 Employee can mark as complete his task
@@ -357,7 +356,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<TaskDto> listTask = objectMapper.readValue(listTasksResponse, new TypeReference<>() {
+        List<TaskResponseDto> listTask = objectMapper.readValue(listTasksResponse, new TypeReference<>() {
         });
         assertThat(listTask.size()).isEqualTo(1);
 
@@ -368,7 +367,7 @@ public class ShouldAuthenticateManageTasksAndUsersIntegrationTest{
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        TaskDto deletedTask = objectMapper.readValue(deletedTaskResponse, new TypeReference<>() {
+        TaskResponseDto deletedTask = objectMapper.readValue(deletedTaskResponse, new TypeReference<>() {
         });
 
         assertThat(deletedTask).isEqualTo(listTask.get(0));

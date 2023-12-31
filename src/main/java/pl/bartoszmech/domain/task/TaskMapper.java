@@ -1,12 +1,15 @@
 package pl.bartoszmech.domain.task;
 
-import pl.bartoszmech.domain.task.dto.TaskDto;
+import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
+import pl.bartoszmech.application.response.TaskResponseDto;
 
 import java.time.LocalDateTime;
 
-class TaskMapper {
-    static TaskDto mapFromTask(Task savedTask) {
-        return TaskDto.builder()
+import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
+
+public class TaskMapper {
+    public static TaskResponseDto mapFromTask(Task savedTask) {
+        return TaskResponseDto.builder()
                 .id(savedTask.getId())
                 .title(savedTask.getTitle())
                 .description(savedTask.getDescription())
@@ -18,7 +21,7 @@ class TaskMapper {
                 .build();
     }
 
-    static Task mapToTask(TaskDto taskDto) {
+    public static Task mapToTask(TaskResponseDto taskDto) {
         return new Task(
                 taskDto.id(),
                 taskDto.title(),
@@ -41,5 +44,17 @@ class TaskMapper {
                 dateTime.getMinute(),
                 dateTime.getSecond()
         );
+    }
+
+    public static TaskResponseDto mapFromCreateAndUpdateRequestDto(CreateAndUpdateTaskRequestDto requestedTask, LocalDateTime now) {
+        return TaskResponseDto.builder()
+                .title(requestedTask.title())
+                .description(requestedTask.description())
+                .status(PENDING)
+                .startDate(now)
+                .endDate(requestedTask.endDate())
+                .completedAt(null)
+                .assignedTo(requestedTask.assignedTo())
+                .build();
     }
 }
