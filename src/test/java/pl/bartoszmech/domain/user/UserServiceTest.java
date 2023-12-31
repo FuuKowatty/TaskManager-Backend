@@ -17,7 +17,7 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
-public class UserFacadeTest {
+public class UserServiceTest {
     UserService userService = new UserServiceImpl(new UserRepositoryTestImpl());
     @Test
     public void should_successfully_create_user() {

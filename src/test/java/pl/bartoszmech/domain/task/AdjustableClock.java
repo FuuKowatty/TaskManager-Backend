@@ -104,4 +104,11 @@ public class AdjustableClock extends Clock {
         Duration offset = Duration.ofMinutes(minutes);
         advanceInTimeBy(offset);
     }
+
+    public void plusMonths(int months) {
+        LocalDateTime currentDateTime = LocalDateTime.ofInstant(instant, zone);
+        LocalDateTime updatedDateTime = currentDateTime.plusMonths(months);
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(updatedDateTime, zone);
+        this.instant = zonedDateTime.toInstant();
+    }
 }

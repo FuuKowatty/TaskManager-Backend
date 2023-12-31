@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
-import pl.bartoszmech.infrastructure.task.TaskInfoResponseDto;
+import pl.bartoszmech.application.response.TaskInfoResponseDto;
 
 
 @ControllerAdvice

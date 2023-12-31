@@ -21,7 +21,7 @@ import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
 import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
 import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
-public class TaskFacadeTest {
+public class TaskServiceTest {
     private final AdjustableClock clock = new AdjustableClock(
             LocalDateTime.of(2014, 12, 22, 10, 15, 30).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")

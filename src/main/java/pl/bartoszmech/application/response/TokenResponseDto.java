@@ -1,4 +1,4 @@
-package pl.bartoszmech.infrastructure.auth.dto;
+package pl.bartoszmech.application.response;
 
 import lombok.Builder;
 @Builder

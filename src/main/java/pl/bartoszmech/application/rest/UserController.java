@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
-import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
+import pl.bartoszmech.infrastructure.apivalidation.ParameterValidation;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
 import pl.bartoszmech.infrastructure.user.EmployeeStatisticDto;
 import pl.bartoszmech.infrastructure.user.EmployeeStatisticService;
@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -66,12 +67,13 @@ public class UserController {
         return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 
     @GetMapping("/stats/sorted-by-completed-tasks")
-    public List<EmployeeStatisticDto> listBestEmployee(@RequestParam(
+    public ResponseEntity<List<EmployeeStatisticDto>> listBestEmployee(@RequestParam(
             name = "last-months",
             required = false,
             defaultValue = "6"
     ) int lastMonths) {
-        return employeeStatisticService.sortEmployeesByCompletedTasks(lastMonths);
+        ParameterValidation.validateLastMonths(lastMonths);
+        return ResponseEntity.status(OK).body(employeeStatisticService.sortEmployeesByCompletedTasks(lastMonths));
     }
 }
 

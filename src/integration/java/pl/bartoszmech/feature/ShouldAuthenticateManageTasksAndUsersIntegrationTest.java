@@ -13,8 +13,8 @@ import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.application.response.TaskResponseDto;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
-import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
-import pl.bartoszmech.infrastructure.auth.dto.TokenResponseDto;
+import pl.bartoszmech.application.request.TokenRequestDto;
+import pl.bartoszmech.application.response.TokenResponseDto;
 
 import java.time.Clock;
 import java.time.LocalDateTime;

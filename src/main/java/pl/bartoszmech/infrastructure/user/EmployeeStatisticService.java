@@ -18,8 +18,8 @@ public class EmployeeStatisticService {
     UserService userService;
 
     public List<EmployeeStatisticDto> sortEmployeesByCompletedTasks(int lastMonths) {
-        List<CompletedTasksByAssignedtoResponseDto> completedTasksOfEachEmployeeFromLastSixMonths = taskService.getCompletedTasksByAssignedTo(lastMonths);
-        List<EmployeeStatisticDto> employeeStatisticDtoList = getUsersToCompletedTasks(completedTasksOfEachEmployeeFromLastSixMonths);
+        List<CompletedTasksByAssignedtoResponseDto> completedTasksOfEachEmployeeFromLastMonths = taskService.getCompletedTasksByAssignedTo(lastMonths);
+        List<EmployeeStatisticDto> employeeStatisticDtoList = getUsersToCompletedTasks(completedTasksOfEachEmployeeFromLastMonths);
         return employeeStatisticDtoList.stream()
                 .sorted(Comparator.comparing(EmployeeStatisticDto::numberOfCompletedTasks)
                         .reversed())
