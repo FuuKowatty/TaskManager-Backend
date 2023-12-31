@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.application.services.EmployeeAnalysisService;
+import pl.bartoszmech.domain.task.service.TaskService;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ParameterValidation;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
-import pl.bartoszmech.infrastructure.user.EmployeeStatisticDto;
-import pl.bartoszmech.infrastructure.user.EmployeeStatisticService;
+import pl.bartoszmech.application.response.CompletedTasksStatisticResponseDto;
 
 import java.util.List;
 
@@ -31,24 +33,26 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
-    UserService userFacade;
+    UserService userService;
     AuthorizationService authorizationService;
     PasswordEncoder passwordEncoder;
-    EmployeeStatisticService employeeStatisticService;
+    TaskService taskService;
+    EmployeeAnalysisService employeeAnalysisService;
+
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> list() {
-        return ResponseEntity.status(OK).body(userFacade.listUsers());
+        return ResponseEntity.status(OK).body(userService.listUsers());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findById(@PathVariable("id") long id) {
-        return ResponseEntity.status(OK).body(userFacade.findById(id));
+        return ResponseEntity.status(OK).body(userService.findById(id));
     }
 
     @PostMapping
     public ResponseEntity<UserResponseDto> create(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(CREATED).body(userFacade.createUser(CreateAndUpdateUserRequestDto.builder()
+        return ResponseEntity.status(CREATED).body(userService.createUser(CreateAndUpdateUserRequestDto.builder()
                 .firstName(requestDto.firstName())
                 .lastName(requestDto.lastName())
                 .email(requestDto.email())
@@ -59,21 +63,26 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserResponseDto> deleteById(@PathVariable("id") long id) {
-        return ResponseEntity.status(OK).body(userFacade.deleteById(id));    }
+        return ResponseEntity.status(OK).body(userService.deleteById(id));    }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
+        return ResponseEntity.status(OK).body(userService.updateUser(id, requestDto));    }
 
     @GetMapping("/stats/sorted-by-completed-tasks")
-    public ResponseEntity<List<EmployeeStatisticDto>> listBestEmployee(@RequestParam(
+    public ResponseEntity<List<CompletedTasksStatisticResponseDto>> listBestEmployee(@RequestParam(
             name = "last-months",
             required = false,
             defaultValue = "6"
     ) int lastMonths) {
         ParameterValidation.validateLastMonths(lastMonths);
-        return ResponseEntity.status(OK).body(employeeStatisticService.sortEmployeesByCompletedTasks(lastMonths));
+
+        List<CompletedTasksByAssignedtoResponseDto> completedTasks = taskService.getCompletedTasksByAssignedTo(lastMonths);
+        List<UserResponseDto> employees = userService.listEmployees();
+
+        List<CompletedTasksStatisticResponseDto> statistics = employeeAnalysisService.sortEmployeesByCompletedTasks(employees, completedTasks, lastMonths);
+        return ResponseEntity.ok(statistics);
     }
 }
 

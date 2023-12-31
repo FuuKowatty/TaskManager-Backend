@@ -2,7 +2,6 @@ package pl.bartoszmech.domain.task.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import pl.bartoszmech.domain.task.*;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;

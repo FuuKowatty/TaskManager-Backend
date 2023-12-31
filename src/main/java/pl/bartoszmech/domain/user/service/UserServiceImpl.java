@@ -14,6 +14,7 @@ import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import java.util.List;
 
 import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
+import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -48,6 +49,13 @@ public class UserServiceImpl implements UserService {
                 .findAll()
                 .stream()
                 .map(UserMapper::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public List<UserResponseDto> listEmployees() {
+        return listUsers().stream()
+                .filter(user -> user.role() == EMPLOYEE)
                 .toList();
     }
 
