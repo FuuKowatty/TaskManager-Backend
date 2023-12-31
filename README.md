@@ -5,7 +5,7 @@ Administrator, Manager and Employee. This makes working very efficient and ensur
 The program implements Spring Security 6 + JSON Web Token, which provide authentication and authorisation.
 All logic is based on two domains: user and task.
 
-The application is based on a modular monolith with hexagonal architecture, so we have a clear direction between app logic and web services.
+The application is based on DDD (Domain Driven Design) with hexagonal architecture, so we have a clear direction between client scope, business logic and implementations.
 
 
 ## Architecture
