@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -34,6 +35,20 @@ public class ValidationErrorHandler {
     public ResponseEntity<ValidationResponse> handleDateTimeException(HttpMessageNotReadableException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ValidationResponse(List.of(e.getMessage())));
     }
+
+    @ExceptionHandler(InvalidLastMonthsParameterException.class)
+    @ResponseBody
+    public ResponseEntity<ValidationResponse> handleDateTimeException(InvalidLastMonthsParameterException e) {
+        return ResponseEntity.status(BAD_REQUEST).body(new ValidationResponse(List.of(e.getMessage())));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseBody
+    public ResponseEntity<ValidationResponse> handleDateTimeException(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.status(BAD_REQUEST).body(new ValidationResponse(List.of(e.getMessage())));
+    }
+
+
 
     private List<String> getErrorsFromException(MethodArgumentNotValidException exception) {
         return exception.getBindingResult()
