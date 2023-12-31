@@ -13,12 +13,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
-import pl.bartoszmech.infrastructure.auth.dto.TokenRequestDto;
+import pl.bartoszmech.application.request.TokenRequestDto;
 
 
 @AllArgsConstructor
 @Component
-public class JwtAuthenticatorFacade {
+public class JwtAuthenticatorService {
 
     private final AuthenticationManager authenticationManager;
     private final Clock clock;
