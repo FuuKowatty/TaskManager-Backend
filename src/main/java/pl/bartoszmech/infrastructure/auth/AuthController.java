@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
+    public ResponseEntity<UserResponseDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
         return ResponseEntity.status(CREATED).body(userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
                 .firstName(user.firstName())
                 .lastName(user.lastName())

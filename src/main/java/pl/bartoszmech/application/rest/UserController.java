@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.AuthorizationService;
@@ -34,17 +35,17 @@ public class UserController {
     PasswordEncoder passwordEncoder;
     EmployeeStatisticService employeeStatisticService;
     @GetMapping
-    public ResponseEntity<List<UserDto>> list() {
+    public ResponseEntity<List<UserResponseDto>> list() {
         return ResponseEntity.status(OK).body(userFacade.listUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable("id") long id) {
+    public ResponseEntity<UserResponseDto> findById(@PathVariable("id") long id) {
         return ResponseEntity.status(OK).body(userFacade.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> create(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(CREATED).body(userFacade.createUser(CreateAndUpdateUserRequestDto.builder()
                 .firstName(requestDto.firstName())
@@ -56,11 +57,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDto> deleteById(@PathVariable("id") long id) {
+    public ResponseEntity<UserResponseDto> deleteById(@PathVariable("id") long id) {
         return ResponseEntity.status(OK).body(userFacade.deleteById(id));    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(OK).body(userFacade.updateUser(id, requestDto));    }
 

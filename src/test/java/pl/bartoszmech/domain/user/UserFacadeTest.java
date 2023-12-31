@@ -3,6 +3,7 @@ package pl.bartoszmech.domain.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.domain.user.service.UserServiceImpl;
@@ -27,7 +28,7 @@ public class UserFacadeTest {
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
         //when
-        UserDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -77,7 +78,7 @@ public class UserFacadeTest {
     @Test
     public void should_success_return_empty_list_after_list_users() {
         //when
-        List<UserDto> users = userService.listUsers();
+        List<UserResponseDto> users = userService.listUsers();
         //then
         assertThat(users).isEmpty();
     }
@@ -90,7 +91,7 @@ public class UserFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -100,7 +101,7 @@ public class UserFacadeTest {
                 .build()
         );
         //when
-        List<UserDto> users = userService.listUsers();
+        List<UserResponseDto> users = userService.listUsers();
         //then
         assertThat(users.get(0)).isEqualTo(savedUser);
     }
@@ -113,7 +114,7 @@ public class UserFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -123,7 +124,7 @@ public class UserFacadeTest {
                 .build()
         );
         //when
-        UserDto foundUser = userService.findById(savedUser.id());
+        UserResponseDto foundUser = userService.findById(savedUser.id());
         //then
         assertThat(foundUser).isEqualTo(savedUser);
     }
@@ -147,7 +148,7 @@ public class UserFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -157,7 +158,7 @@ public class UserFacadeTest {
                 .build()
         );
         //when
-        UserDto deletedUser = userService.deleteById(savedUser.id());
+        UserResponseDto deletedUser = userService.deleteById(savedUser.id());
         //then
         assertThat(deletedUser).isEqualTo(savedUser);
         assertThat(userService.listUsers()).isEmpty();
@@ -182,7 +183,7 @@ public class UserFacadeTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName("OtherNameThanDany")
                 .lastName("OtherSurnameThanDany")
@@ -192,7 +193,7 @@ public class UserFacadeTest {
                 .build()
         );
         //when
-        UserDto updatedUser = userService.updateUser(savedUser.id(), CreateAndUpdateUserRequestDto.builder()
+        UserResponseDto updatedUser = userService.updateUser(savedUser.id(), CreateAndUpdateUserRequestDto.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
@@ -246,7 +247,7 @@ public class UserFacadeTest {
                 .role(role)
                 .build()
         );
-        UserDto savedUser2 = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser2 = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName("Bartosz")
                 .lastName("Mech")
@@ -276,20 +277,26 @@ public class UserFacadeTest {
     public void should_find_user_by_email() {
         //given
         String email = "example@gmail.com";
-        UserDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        String password = "XXXXXXXX";
+        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
                 .builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(email)
-                .password("XXXXXXXX")
+                .password(password)
                 .role(EMPLOYEE)
                 .build()
         );
         //when
         UserDto foundUser = userService.findByEmail(email);
         //then
-        assertThat(foundUser).isEqualTo(savedUser);
-        assertThat(foundUser.id()).isNotNull();
+        assertAll("User credentials test",
+                () -> assertThat(foundUser.id()).isNotNull(),
+                () -> assertThat(foundUser.email()).isEqualTo(savedUser.email()),
+                () -> assertThat(foundUser.firstName()).isEqualTo(savedUser.firstName()),
+                () -> assertThat(foundUser.lastName()).isEqualTo(savedUser.lastName()),
+                () -> assertThat(foundUser.role()).isEqualTo(savedUser.role())
+        );
     }
 
     @Test
@@ -305,7 +312,7 @@ public class UserFacadeTest {
         //given
         String email = "example@gmail.com";
         //when
-        UserDto savedUser = userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
+        UserResponseDto savedUser = userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(email)
@@ -321,7 +328,7 @@ public class UserFacadeTest {
         //given
         String email = "example@gmail.com";
         //when
-        UserDto savedUser = userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
+        UserResponseDto savedUser = userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(email)

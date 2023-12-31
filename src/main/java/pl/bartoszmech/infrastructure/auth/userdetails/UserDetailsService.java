@@ -12,11 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
-    private final UserService service;
+    private final UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws BadCredentialsException {
-        UserDto userDto = service.findByEmail(username);
+        UserDto userDto = userService.findByEmail(username);
         return getUser(userDto);
     }
 

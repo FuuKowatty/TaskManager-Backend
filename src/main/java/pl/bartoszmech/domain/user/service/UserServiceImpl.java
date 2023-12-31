@@ -3,6 +3,7 @@ package pl.bartoszmech.domain.user.service;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.EmailTakenException;
 import pl.bartoszmech.domain.user.User;
 import pl.bartoszmech.domain.user.UserMapper;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(CreateAndUpdateUserRequestDto inputUser) {
+    public UserResponseDto createUser(CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsed(inputUser.email());
         User savedUser = repository.save(new User(
                     inputUser.firstName(),
@@ -38,36 +39,36 @@ public class UserServiceImpl implements UserService {
                     inputUser.password(),
                     inputUser.role()
                 ));
-        return UserMapper.mapFromUser(savedUser);
+        return UserMapper.mapToResponse(savedUser);
     }
 
     @Override
-    public List<UserDto> listUsers() {
+    public List<UserResponseDto> listUsers() {
         return repository
                 .findAll()
                 .stream()
-                .map(UserMapper::mapFromUser)
+                .map(UserMapper::mapToResponse)
                 .toList();
     }
 
     @Override
-    public UserDto findById(Long id) {
+    public UserResponseDto findById(Long id) {
         User foundUser = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
-        return UserMapper.mapFromUser(foundUser);
+        return UserMapper.mapToResponse(foundUser);
     }
 
     @Override
-    public UserDto deleteById(Long id) {
-        UserDto deletedUser = findById(id);
+    public UserResponseDto deleteById(Long id) {
+        UserResponseDto deletedUser = findById(id);
         repository.deleteById(id);
         return deletedUser;
     }
 
     @Override
-    public UserDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
+    public UserResponseDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
-        return UserMapper.mapFromUser(repository.save(new User(
+        return UserMapper.mapToResponse(repository.save(new User(
                 id,
                 inputUser.firstName(),
                 inputUser.lastName(),
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto registerAdmin(CreateAndUpdateUserRequestDto inputUser) {
+    public UserResponseDto registerAdmin(CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsed(inputUser.email());
         return createUser(CreateAndUpdateUserRequestDto.builder()
                 .firstName(inputUser.firstName())

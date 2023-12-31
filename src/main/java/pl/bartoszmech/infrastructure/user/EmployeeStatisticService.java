@@ -3,6 +3,7 @@ package pl.bartoszmech.infrastructure.user;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.task.service.TaskService;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
@@ -29,7 +30,7 @@ public class EmployeeStatisticService {
         return completedTasksByAssignedtoResponseDtoList
                 .stream()
                 .map(task -> {
-                    UserDto user = userService.findById(task.assignedTo());
+                    UserResponseDto user = userService.findById(task.assignedTo());
                     return new EmployeeStatisticDto(user, task.numberOfCompletedTasks());
                 })
                 .toList();

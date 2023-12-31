@@ -1,6 +1,6 @@
 package pl.bartoszmech.infrastructure.user;
 
-import pl.bartoszmech.domain.user.dto.UserDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 
-public record EmployeeStatisticDto(UserDto user, Integer numberOfCompletedTasks) {
+public record EmployeeStatisticDto(UserResponseDto user, Integer numberOfCompletedTasks) {
 }
