@@ -14,7 +14,7 @@ import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
-import pl.bartoszmech.infrastructure.security.jwt.JwtAuthenticatorFacade;
+import pl.bartoszmech.infrastructure.security.jwt.JwtAuthenticatorService;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -24,7 +24,7 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 @RequestMapping("/accounts")
 @AllArgsConstructor
 public class AuthController {
-    private final JwtAuthenticatorFacade jwtAuthenticatorService;
+    private final JwtAuthenticatorService jwtAuthenticatorService;
     private final UserService userService;
     PasswordEncoder passwordEncoder;
     @PostMapping("/token")
