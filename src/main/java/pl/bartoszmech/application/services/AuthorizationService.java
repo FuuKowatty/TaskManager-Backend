@@ -1,4 +1,4 @@
-package pl.bartoszmech.infrastructure.auth;
+package pl.bartoszmech.application.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.bartoszmech.domain.user.UserRoles;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
+import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
 
 import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;

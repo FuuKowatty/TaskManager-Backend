@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.application.response.TaskResponseDto;
 import pl.bartoszmech.domain.task.service.TaskService;
-import pl.bartoszmech.infrastructure.auth.AuthorizationService;
+import pl.bartoszmech.application.services.AuthorizationService;
 import pl.bartoszmech.application.response.TaskInfoResponseDto;
 
 import java.util.List;

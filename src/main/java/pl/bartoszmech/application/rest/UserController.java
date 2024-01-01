@@ -20,7 +20,7 @@ import pl.bartoszmech.application.services.EmployeeAnalysisService;
 import pl.bartoszmech.domain.task.service.TaskService;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ParameterValidation;
-import pl.bartoszmech.infrastructure.auth.AuthorizationService;
+import pl.bartoszmech.application.services.AuthorizationService;
 import pl.bartoszmech.application.response.CompletedTasksStatisticResponseDto;
 
 import java.util.List;
