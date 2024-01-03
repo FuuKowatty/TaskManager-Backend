@@ -2,12 +2,19 @@ package pl.bartoszmech.domain.task.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
-import pl.bartoszmech.domain.task.*;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
-import pl.bartoszmech.application.response.TaskResponseDto;
 import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.TaskInfoResponseDto;
+import pl.bartoszmech.application.response.TaskResponseDto;
+
+import pl.bartoszmech.domain.task.DuplicateUserTaskException;
+import pl.bartoszmech.domain.task.EndDateBeforeStartDateException;
+import pl.bartoszmech.domain.task.Task;
+import pl.bartoszmech.domain.task.TaskMapper;
+import pl.bartoszmech.domain.task.TaskStatus;
 import pl.bartoszmech.domain.task.repository.TaskRepository;
+import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -15,7 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static pl.bartoszmech.domain.task.TaskStatus.*;
+import static pl.bartoszmech.application.response.TaskInfoResponseDto.TASK_COMPLETED;
+import static pl.bartoszmech.application.response.TaskInfoResponseDto.TASK_OUTDATED;
+import static pl.bartoszmech.application.response.TaskInfoResponseDto.TASK_ALREADY_COMPLETED;
+import static pl.bartoszmech.domain.task.TaskStatus.COMPLETED;
+import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
+import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
+
 
 @AllArgsConstructor
 @Log4j2
@@ -23,9 +36,7 @@ public class TaskServiceImpl implements TaskService {
     private static final String TASK_DUPLICATE = "Provided task is already assigned to this same user";
     private  static final String INVALID_DATE_ORDER = "Provided invalid dates order";
     private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
-    public static final String TASK_SUCCESSFULLY_COMPLETED = "Task successfully completed";
-    public static final String TASK_IS_OUTDATED = "Task is outdated";
-    public static final String TASK_IS_ALREADY_COMPLETED = "Task is already completed";
+
 
     private final TaskRepository repository;
 
@@ -58,24 +69,29 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public String completeTask(long id) {
-        TaskResponseDto task = findById(id);
-        if (task.status().equals(PENDING)) {
-            markTaskAs(COMPLETED, id, getNow());
-            return TASK_SUCCESSFULLY_COMPLETED;
+    @Transactional
+    public TaskInfoResponseDto completeTask(long id) {
+        Task task = findEntityById(id);
+        TaskStatus status = task.getStatus();
+        if (status.equals(PENDING)) {
+            task.complete(getNow());
+            return TASK_COMPLETED();
         }
-        if (task.endDate().isBefore(getNow())) {
-            return TASK_IS_OUTDATED;
+        if (status.equals(FAILED)) {
+            return TASK_OUTDATED();
         }
-        return TASK_IS_ALREADY_COMPLETED;
+        return TASK_ALREADY_COMPLETED();
     }
 
 
     @Override
     public TaskResponseDto findById(long id) {
-        Task foundTask = repository.findById(id)
+        return TaskMapper.mapFromTask(findEntityById(id));
+    }
+
+    private Task findEntityById(long id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound(TASK_NOT_FOUND));
-        return TaskMapper.mapFromTask(foundTask);
     }
 
     @Override

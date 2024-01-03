@@ -1,9 +1,12 @@
-package pl.bartoszmech.domain.user;
+package pl.bartoszmech.domain.user.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.domain.user.EmailTakenException;
+import pl.bartoszmech.domain.user.UserRepositoryTestImpl;
+import pl.bartoszmech.domain.user.UserRoles;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.domain.user.service.UserServiceImpl;

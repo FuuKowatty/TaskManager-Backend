@@ -65,8 +65,8 @@ public class TaskController {
     @PatchMapping("/{id}/complete")
     public ResponseEntity<TaskInfoResponseDto> completeTask(@PathVariable("id") long id) {
         findTaskAndCheckIfEmployeeHasPermission(id);
-        String messageStatus = taskService.completeTask(id);
-        return ResponseEntity.status(OK).body(new TaskInfoResponseDto(messageStatus));
+        TaskInfoResponseDto taskResponse = taskService.completeTask(id);
+        return ResponseEntity.status(taskResponse.status()).body(taskResponse);
     }
 
     private TaskResponseDto findTaskAndCheckIfEmployeeHasPermission(long id) {

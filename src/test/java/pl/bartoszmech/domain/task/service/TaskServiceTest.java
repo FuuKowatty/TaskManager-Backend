@@ -1,6 +1,11 @@
-package pl.bartoszmech.domain.task;
+package pl.bartoszmech.domain.task.service;
 
 import org.junit.jupiter.api.Test;
+import pl.bartoszmech.application.response.TaskInfoResponseDto;
+import pl.bartoszmech.domain.task.AdjustableClock;
+import pl.bartoszmech.domain.task.DuplicateUserTaskException;
+import pl.bartoszmech.domain.task.EndDateBeforeStartDateException;
+import pl.bartoszmech.domain.task.TaskRepositoryTestImpl;
 import pl.bartoszmech.domain.task.service.TaskService;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
@@ -403,11 +408,11 @@ public class TaskServiceTest {
                 .assignedTo(997L)
                 .build());
         //when
-        String message = taskService.completeTask(savedTask.id());
+        TaskInfoResponseDto taskResponse = taskService.completeTask(savedTask.id());
         //then
         TaskResponseDto updatedTask = taskService.findById(savedTask.id());
         assertThat(updatedTask.status()).isEqualTo(COMPLETED);
-        assertThat(message).isEqualTo("Task successfully completed");
+        assertThat(taskResponse.message()).isEqualTo("Task created successfully");
         assertThat(updatedTask.completedAt()).isEqualTo(LocalDateTime.now(clock));
     }
 
@@ -422,11 +427,11 @@ public class TaskServiceTest {
                 .build());
         taskService.completeTask(savedTask.id());
         //when
-        String message = taskService.completeTask(savedTask.id());
+        TaskInfoResponseDto taskResponse = taskService.completeTask(savedTask.id());
         //then
         TaskResponseDto updatedTask = taskService.findById(savedTask.id());
         assertThat(updatedTask.status()).isEqualTo(COMPLETED);
-        assertThat(message).isEqualTo("Task is already completed");
+        assertThat(taskResponse.message()).isEqualTo("Task is already completed");
     }
 
     @Test
@@ -441,11 +446,11 @@ public class TaskServiceTest {
         clock.advanceInTimeBy(Duration.ofSeconds(2));
         taskService.markAsFailedOutdatedTasks();
         //when
-        String message = taskService.completeTask(savedTask.id());
+        TaskInfoResponseDto taskResponse = taskService.completeTask(savedTask.id());
         //then
         TaskResponseDto updatedTask = taskService.findById(savedTask.id());
         assertThat(updatedTask.status()).isEqualTo(FAILED);
-        assertThat(message).isEqualTo("Task is outdated");
+        assertThat(taskResponse.message()).isEqualTo("Task is outdated");
         assertThat(updatedTask.completedAt()).isNull();
     }
 

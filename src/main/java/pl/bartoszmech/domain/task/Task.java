@@ -69,4 +69,9 @@ public class Task {
     public int hashCode() {
         return Objects.hash(id, title, description, status, startDate, endDate, assignedTo);
     }
+
+    public void complete(LocalDateTime now) {
+        this.status = TaskStatus.COMPLETED;
+        this.completedAt = now;
+    }
 }

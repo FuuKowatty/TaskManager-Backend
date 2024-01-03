@@ -1,10 +1,12 @@
-package pl.bartoszmech.domain.task;
+package pl.bartoszmech.application.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.domain.task.AdjustableClock;
+import pl.bartoszmech.domain.task.TaskRepositoryTestImpl;
 import pl.bartoszmech.domain.task.service.TaskService;
 import pl.bartoszmech.domain.task.service.TaskServiceImpl;
 
