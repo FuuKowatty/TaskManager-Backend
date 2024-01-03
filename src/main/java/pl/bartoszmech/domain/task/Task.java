@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
 
 
 @Getter
@@ -73,5 +74,9 @@ public class Task {
     public void complete(LocalDateTime now) {
         this.status = TaskStatus.COMPLETED;
         this.completedAt = now;
+    }
+
+    public void fail() {
+        this.status = FAILED;
     }
 }

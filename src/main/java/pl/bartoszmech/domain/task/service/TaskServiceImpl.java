@@ -120,23 +120,6 @@ public class TaskServiceImpl implements TaskService {
         );
     }
 
-
-
-
-    private void markTaskAs(TaskStatus status, long id, LocalDateTime completedAt) {
-        TaskResponseDto foundTask = findById(id);
-        repository.save(new Task(
-                foundTask.id(),
-                foundTask.title(),
-                foundTask.description(),
-                status,
-                foundTask.startDate(),
-                foundTask.endDate(),
-                completedAt,
-                foundTask.assignedTo()
-        ));
-    }
-
     @Override
     public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
         LocalDateTime taskEndDateRange = getNow().minusMonths(lastMonths);
@@ -148,12 +131,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public void markAsFailedOutdatedTasks() {
         LocalDateTime checkedDateTime = getNow();
-        listTasks()
+        repository.findAll()
             .stream()
-            .filter(task -> task.status() == PENDING && task.endDate().isBefore(checkedDateTime))
-            .forEach(task -> markTaskAs(FAILED, task.id(), null));
+            .filter(task -> task.getStatus() == PENDING && task.getEndDate().isBefore(checkedDateTime))
+            .forEach(Task::fail);
     }
 
     private void validateIfTaskCanBeCreated(TaskResponseDto inputTask) {
