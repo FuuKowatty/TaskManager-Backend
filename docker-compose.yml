@@ -3,12 +3,22 @@ version: '3.1'
 services:
   postgres:
     image: postgres:14.1
-    restart: always
+    restart: no
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: taskmanager
-    volumes:
-      - ./init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
     ports:
       - "5432:5432"
+
+  java_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: no
+    depends_on:
+      - postgres
+    environment:
+      - ${JWT_SECRET}
+    ports:
+      - "8080:8080"
