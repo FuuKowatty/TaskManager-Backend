@@ -19,6 +19,7 @@ services:
     depends_on:
       - postgres
     environment:
-      - ${JWT_SECRET}
+      - TZ=Europe/Warsaw
+      - JWT_SECRET=${JWT_SECRET}
     ports:
       - "8080:8080"
