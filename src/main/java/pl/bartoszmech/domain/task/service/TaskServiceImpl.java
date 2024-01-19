@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
-import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.application.response.TaskInfoResponseDto;
 import pl.bartoszmech.application.response.TaskResponseDto;
 
@@ -121,12 +121,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
+    public List<CompletedTasksByAssignedToResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
         LocalDateTime taskEndDateRange = getNow().minusMonths(lastMonths);
         List<TaskResponseDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
         Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
         return tasksByAssignedTo.entrySet().stream()
-                .map(entry -> new CompletedTasksByAssignedtoResponseDto(entry.getKey(), entry.getValue()))
+                .map(entry -> new CompletedTasksByAssignedToResponseDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 

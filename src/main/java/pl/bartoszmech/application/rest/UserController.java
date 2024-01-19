@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
-import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.application.services.EmployeeAnalysisService;
 import pl.bartoszmech.domain.task.service.TaskService;
@@ -33,11 +33,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
-    UserService userService;
-    AuthorizationService authorizationService;
-    PasswordEncoder passwordEncoder;
-    TaskService taskService;
-    EmployeeAnalysisService employeeAnalysisService;
+    private final UserService userService;
+    private final AuthorizationService authorizationService;
+    private final PasswordEncoder passwordEncoder;
+    private final TaskService taskService;
+    private final EmployeeAnalysisService employeeAnalysisService;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> list() {
@@ -78,7 +78,7 @@ public class UserController {
     ) int lastMonths) {
         ParameterValidation.validateLastMonths(lastMonths);
 
-        List<CompletedTasksByAssignedtoResponseDto> completedTasks = taskService.getCompletedTasksByAssignedTo(lastMonths);
+        List<CompletedTasksByAssignedToResponseDto> completedTasks = taskService.getCompletedTasksByAssignedTo(lastMonths);
         List<UserResponseDto> employees = userService.listEmployees();
 
         List<CompletedTasksStatisticResponseDto> statistics = employeeAnalysisService.sortEmployeesByCompletedTasks(employees, completedTasks, lastMonths);

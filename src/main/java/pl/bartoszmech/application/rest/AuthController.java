@@ -26,7 +26,7 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 public class AuthController {
     private final JwtAuthenticatorService jwtAuthenticatorService;
     private final UserService userService;
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);

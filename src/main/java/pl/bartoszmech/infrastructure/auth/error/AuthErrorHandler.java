@@ -29,7 +29,7 @@ public class AuthErrorHandler {
 
     @ExceptionHandler(UnauthorizedAccessException.class)
     @ResponseBody
-    public ResponseEntity<AuthErrorResponseBody> handleEmailTaken(UnauthorizedAccessException error) {
+    public ResponseEntity<AuthErrorResponseBody> handleInvalidPermission(UnauthorizedAccessException error) {
         return ResponseEntity.status(FORBIDDEN).body(new AuthErrorResponseBody(error.getMessage()));
     }
 }

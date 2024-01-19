@@ -20,7 +20,7 @@ public class AuthorizationService {
     private static final String ADMIN_CREATION_NOT_ALLOWED = "Admin cannot create other admin, please authenticate via valid endpoint";
     public static final String EMPLOYEE_TRYING_READ_NOT_HIS_TASKS = "You dont have permission to read tasks of employee with id: ";
 
-    UserService userService;
+    private final UserService userService;
     public void hasUserPermissionToReadTaskWithId(long taskId,  long assignedTo) {
         UserDto user = findAuthenticatedUser();
         if (user.role().equals(EMPLOYEE) && assignedTo != user.id()) {
