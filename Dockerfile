@@ -1,19 +1,3 @@
-FROM openjdk:17.0.1-jdk-slim as build
-
-COPY .mvn .mvn
-COPY mvnw .
-COPY pom.xml .
-
-RUN ./mvnw -B dependency:go-offline
-
-COPY src src
-
-RUN ./mvnw -B package
-
-FROM openjdk:17.0.1-jdk-slim
-
-COPY --from=build target/TaskManager-Backend-0.0.1-SNAPSHOT.jar .
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "TaskManager-Backend-0.0.1-SNAPSHOT.jar"]
+FROM eclipse-temurin:17-jre-alpine
+COPY /target/taskmanager.jar /taskmanager.jar
+ENTRYPOINT ["java","-jar","/taskmanager.jar"]
