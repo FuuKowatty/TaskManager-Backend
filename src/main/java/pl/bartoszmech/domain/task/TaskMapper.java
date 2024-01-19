@@ -1,5 +1,6 @@
 package pl.bartoszmech.domain.task;
 
+import lombok.NoArgsConstructor;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.application.response.TaskResponseDto;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
+@NoArgsConstructor
 public class TaskMapper {
     public static TaskResponseDto mapFromTask(Task savedTask) {
         return TaskResponseDto.builder()

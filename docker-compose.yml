@@ -2,13 +2,26 @@ version: '3.1'
 
 services:
   postgres:
+    container_name: postgres
     image: postgres:14.1
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: taskmanager
-    volumes:
-      - ./init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
     ports:
       - "5432:5432"
+  taskmanager:
+    container_name: taskmanager
+    build: .
+#    image: 086152582278.dkr.ecr.eu-north-1.amazonaws.com/taskmanager
+    restart: always
+    ports:
+      - '8000:8000'
+    environment:
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: taskmanager
+      DB_AUTH_SOURCE: admin
