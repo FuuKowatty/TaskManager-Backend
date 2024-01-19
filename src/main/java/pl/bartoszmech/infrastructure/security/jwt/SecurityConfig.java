@@ -31,7 +31,7 @@
                 "/swagger-resources/**",
                 "/swagger-ui/**",
                 "/webjars/**",
-                "/swagger-ui.html"
+                "/v3/api-docs/**"
         };
 
         private final JwtAuthTokenFilter jwtAuthTokenFilter;
