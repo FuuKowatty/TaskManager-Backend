@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
@@ -29,32 +30,12 @@ public class AuthController {
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
-        return ResponseEntity.status(OK).body(buildTokenResponseDto(jwtDto));
+        return ResponseEntity.status(OK).body(UserMapper.mapToTokenResponse(jwtDto));
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
-        return ResponseEntity.status(CREATED).body(userService.registerAdmin(buildCreateAndUpdateUserRequestDto(user)));
-    }
-
-    private TokenResponseDto buildTokenResponseDto(JwtResponseDto jwtDto) {
-        String email = jwtDto.username();
-        UserDto user = userService.findByEmail(email);
-
-        return TokenResponseDto.builder()
-                .token(jwtDto.token())
-                .email(email)
-                .id(user.id())
-                .build();
-    }
-
-    private CreateAndUpdateUserRequestDto buildCreateAndUpdateUserRequestDto(CreateAndUpdateUserRequestDto user) {
-        return CreateAndUpdateUserRequestDto.builder()
-                .firstName(user.firstName())
-                .lastName(user.lastName())
-                .email(user.email())
-                .password(user.password())
-                .role(ADMIN)
-                .build();
+        CreateAndUpdateUserRequestDto inputAdmin = UserMapper.mapToCreateAdminRequest(user);
+        return ResponseEntity.status(CREATED).body(userService.registerAdmin(inputAdmin));
     }
 }
