@@ -30,7 +30,7 @@ public class TaskController {
     private final TaskService taskService;
     private final AuthorizationService authorizationService;
     @GetMapping
-    public ResponseEntity<List<TaskResponseDto>> listTasks() {
+    public ResponseEntity<List<TaskResponseDto>> findAllTasks() {
         return ResponseEntity.status(OK).body(taskService.listTasks());
     }
 

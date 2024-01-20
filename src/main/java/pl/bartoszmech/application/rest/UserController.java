@@ -40,7 +40,7 @@ public class UserController {
     private final EmployeeAnalysisService employeeAnalysisService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> list() {
+    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
         return ResponseEntity.status(OK).body(userService.listUsers());
     }
 
