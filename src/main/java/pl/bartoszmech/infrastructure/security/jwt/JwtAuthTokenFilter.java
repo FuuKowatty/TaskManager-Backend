@@ -25,7 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthTokenFilter extends OncePerRequestFilter
 {
     private final JwtConfigurationProperties properties;
-    UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");

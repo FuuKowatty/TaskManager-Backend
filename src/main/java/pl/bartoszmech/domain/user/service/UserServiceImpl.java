@@ -2,6 +2,7 @@ package pl.bartoszmech.domain.user.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.EmailTakenException;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private static final String USER_NOT_FOUND_BY_EMAIL = "User with provided email could not be found";
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto findByEmail(String email) {
@@ -33,14 +35,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto createUser(CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsed(inputUser.email());
-        User savedUser = repository.save(new User(
-                    inputUser.firstName(),
-                    inputUser.lastName(),
-                    inputUser.email(),
-                    inputUser.password(),
-                    inputUser.role()
-                ));
+        User savedUser = saveUserWithEncodedPassword(inputUser);
         return UserMapper.mapToResponse(savedUser);
+    }
+
+    private User saveUserWithEncodedPassword(CreateAndUpdateUserRequestDto inputUser) {
+        return repository.save(new User(
+                inputUser.firstName(),
+                inputUser.lastName(),
+                inputUser.email(),
+                passwordEncoder.encode(inputUser.password()),
+                inputUser.role())
+        );
     }
 
     @Override
@@ -76,26 +82,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
-        return UserMapper.mapToResponse(repository.save(new User(
-                id,
-                inputUser.firstName(),
-                inputUser.lastName(),
-                inputUser.email(),
-                inputUser.password(),
-                inputUser.role()
-        )));
+        return UserMapper.mapToResponse(saveUserWithEncodedPassword(inputUser));
     }
 
     @Override
     public UserResponseDto registerAdmin(CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsed(inputUser.email());
-        return createUser(CreateAndUpdateUserRequestDto.builder()
-                .firstName(inputUser.firstName())
-                .lastName(inputUser.lastName())
-                .email(inputUser.email())
-                .password(inputUser.password())
-                .role(ADMIN)
-                .build());
+        return createUser(UserMapper.mapToCreateAdminRequest(inputUser));
     }
 
     private void checkIfEmailIsAlreadyUsedByOtherUser(Long id, CreateAndUpdateUserRequestDto userRequestDto) {

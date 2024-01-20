@@ -11,9 +11,8 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Component
-@Primary
 public class TaskRepositoryImpl implements TaskRepository {
-    PostgreSQLTaskRepository repository;
+    private final PostgreSQLTaskRepository repository;
     @Override
     public Task save(Task entity) {
         return repository.save(entity);

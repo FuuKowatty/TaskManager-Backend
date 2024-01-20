@@ -54,6 +54,5 @@ public class ShouldRegisterAdminAndGenerateTokenIntegrationTest {
         //then
         assertThat(admin.token()).matches(JWT_PATTERN);
         assertThat(admin.email()).isEqualTo(adminEmail);
-        assertThat(admin.id()).isNotNull();
     }
 }

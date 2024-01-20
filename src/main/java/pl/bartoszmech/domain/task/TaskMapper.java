@@ -59,4 +59,17 @@ public class TaskMapper {
                 .assignedTo(requestedTask.assignedTo())
                 .build();
     }
+
+    public static TaskResponseDto mapFromTaskUpdate(CreateAndUpdateTaskRequestDto requestedTask, TaskResponseDto persistedTask ) {
+        return TaskResponseDto.builder()
+                .id(persistedTask.id())
+                .title(requestedTask.title())
+                .description(requestedTask.description())
+                .startDate(persistedTask.startDate())
+                .endDate(requestedTask.endDate())
+                .completedAt(persistedTask.completedAt())
+                .status(persistedTask.status())
+                .assignedTo(requestedTask.assignedTo())
+                .build();
+    }
 }
