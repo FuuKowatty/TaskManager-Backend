@@ -32,23 +32,21 @@ public class ValidationErrorHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
-    public ResponseEntity<ValidationResponse> handleDateTimeException(HttpMessageNotReadableException e) {
+    public ResponseEntity<ValidationResponse> InvalidDateFormatException(HttpMessageNotReadableException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ValidationResponse(List.of(e.getMessage())));
     }
 
     @ExceptionHandler(InvalidLastMonthsParameterException.class)
     @ResponseBody
-    public ResponseEntity<ValidationResponse> handleDateTimeException(InvalidLastMonthsParameterException e) {
+    public ResponseEntity<ValidationResponse> handleLastMonthsException(InvalidLastMonthsParameterException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ValidationResponse(List.of(e.getMessage())));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseBody
-    public ResponseEntity<ValidationResponse> handleDateTimeException(MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<ValidationResponse> InvalidJsonFormatException(MethodArgumentTypeMismatchException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ValidationResponse(List.of(e.getMessage())));
     }
-
-
 
     private List<String> getErrorsFromException(MethodArgumentNotValidException exception) {
         return exception.getBindingResult()
