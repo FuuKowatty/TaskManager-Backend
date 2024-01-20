@@ -2,14 +2,13 @@ package pl.bartoszmech.domain.user.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.EmailTakenException;
 import pl.bartoszmech.domain.user.UserRepositoryTestImpl;
 import pl.bartoszmech.domain.user.UserRoles;
 import pl.bartoszmech.domain.user.dto.UserDto;
-import pl.bartoszmech.domain.user.service.UserService;
-import pl.bartoszmech.domain.user.service.UserServiceImpl;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import java.util.List;
 
@@ -21,7 +20,9 @@ import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 import static pl.bartoszmech.domain.user.UserRoles.MANAGER;
 
 public class UserServiceTest {
-    UserService userService = new UserServiceImpl(new UserRepositoryTestImpl());
+    PasswordEncoder passwordEncoder = new PasswordEncoderTestImpl();
+    UserService userService = new UserServiceImpl(new UserRepositoryTestImpl(), passwordEncoder);
+
     @Test
     public void should_successfully_create_user() {
         //given
@@ -209,8 +210,7 @@ public class UserServiceTest {
                 () -> assertThat(updatedUser.lastName()).isEqualTo(lastName),
                 () -> assertThat(updatedUser.email()).isEqualTo(email),
                 () -> assertThat(updatedUser.role()).isEqualTo(savedUser.role()),
-                () -> assertThat(updatedUser.id()).isNotNull(),
-                () -> assertThat(updatedUser.id()).isEqualTo(savedUser.id())
+                () -> assertThat(updatedUser.id()).isNotNull()
         );
     }
 

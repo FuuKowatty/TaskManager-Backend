@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.domain.user.User;
+import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.application.request.TokenRequestDto;
@@ -30,12 +32,7 @@ public class AuthController {
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
-        String email = jwtDto.username();
-        return ResponseEntity.status(OK).body(TokenResponseDto.builder()
-                .token(jwtDto.token())
-                .email(email)
-                .id(userService.findByEmail(email).id())
-                .build());
+        return ResponseEntity.status(OK).body(buildTokenResponseDto(jwtDto));
     }
 
     @PostMapping("/register")
@@ -47,5 +44,16 @@ public class AuthController {
                 .password(passwordEncoder.encode(user.password()))
                 .role(ADMIN)
                 .build()));
+    }
+
+    private TokenResponseDto buildTokenResponseDto(JwtResponseDto jwtDto) {
+        String email = jwtDto.username();
+        UserDto user = userService.findByEmail(email);
+
+        return TokenResponseDto.builder()
+                .token(jwtDto.token())
+                .email(email)
+                .id(user.id())
+                .build();
     }
 }

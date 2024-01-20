@@ -18,6 +18,7 @@ import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.application.services.EmployeeAnalysisService;
 import pl.bartoszmech.domain.task.service.TaskService;
+import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ParameterValidation;
 import pl.bartoszmech.application.services.AuthorizationService;
@@ -35,7 +36,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class UserController {
     private final UserService userService;
     private final AuthorizationService authorizationService;
-    private final PasswordEncoder passwordEncoder;
     private final TaskService taskService;
     private final EmployeeAnalysisService employeeAnalysisService;
 
@@ -52,13 +52,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDto> create(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(CREATED).body(userService.createUser(CreateAndUpdateUserRequestDto.builder()
-                .firstName(requestDto.firstName())
-                .lastName(requestDto.lastName())
-                .email(requestDto.email())
-                .password(passwordEncoder.encode(requestDto.password()))
-                .role(requestDto.role())
-                .build()));
+        return ResponseEntity.status(CREATED).body(userService.createUser(UserMapper.mapToCreateAndUpdateRequest(requestDto)));
     }
 
     @DeleteMapping("/{id}")
@@ -68,7 +62,8 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(OK).body(userService.updateUser(id, requestDto));    }
+        return ResponseEntity.status(OK).body(userService.updateUser(id, requestDto));
+    }
 
     @GetMapping("/stats/sorted-by-completed-tasks")
     public ResponseEntity<List<CompletedTasksStatisticResponseDto>> listBestEmployee(@RequestParam(
