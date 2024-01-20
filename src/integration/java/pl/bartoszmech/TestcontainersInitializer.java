@@ -44,7 +44,7 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
 
     @EventListener(ContextRefreshedEvent.class)
     public void onBootApp() {
-        //Id is reserved 1-ADMIN, 2-MANAGER, (3-5)-EMPLOYEE
+        //ID is reserved 1-ADMIN, 2-MANAGER, (3-5)-EMPLOYEE
         Arrays.asList(
                 new User(1L,"John" , "Doe", "JohnDoe@example.com", "123456", ADMIN),
                 new User(2L,"Jane" , "Doe", "JaneDoe@example.com", "123456", MANAGER),
