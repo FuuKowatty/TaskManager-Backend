@@ -4,8 +4,6 @@ import lombok.Builder;
 @Builder
 public record TokenResponseDto(
         String token,
-        String email,
-        Long id
-
+        String email
 ) {
 }
