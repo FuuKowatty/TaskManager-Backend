@@ -88,13 +88,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto registerAdmin(CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsed(inputUser.email());
-        return createUser(CreateAndUpdateUserRequestDto.builder()
-                .firstName(inputUser.firstName())
-                .lastName(inputUser.lastName())
-                .email(inputUser.email())
-                .password(inputUser.password())
-                .role(ADMIN)
-                .build());
+        return createUser(UserMapper.mapToCreateAdminRequest(inputUser));
     }
 
     private void checkIfEmailIsAlreadyUsedByOtherUser(Long id, CreateAndUpdateUserRequestDto userRequestDto) {

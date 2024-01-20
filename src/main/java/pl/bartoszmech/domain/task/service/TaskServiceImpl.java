@@ -104,16 +104,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDto updateTask(long id, CreateAndUpdateTaskRequestDto requestedTask) {
         TaskResponseDto foundTask = findById(id);
-        TaskResponseDto inputTask = TaskResponseDto.builder()
-                .id(foundTask.id())
-                .title(requestedTask.title())
-                .description(requestedTask.description())
-                .startDate(foundTask.startDate())
-                .endDate(requestedTask.endDate())
-                .completedAt(foundTask.completedAt())
-                .status(foundTask.status())
-                .assignedTo(requestedTask.assignedTo())
-                .build();
+        TaskResponseDto inputTask = TaskMapper.mapFromTaskUpdate(requestedTask, foundTask);
         validateIfTaskCanBeCreated(inputTask);
         return TaskMapper.mapFromTask(
                 repository.save(TaskMapper.mapToTask(inputTask))
