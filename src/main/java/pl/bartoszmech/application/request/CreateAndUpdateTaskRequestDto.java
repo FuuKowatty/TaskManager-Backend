@@ -11,21 +11,23 @@ import java.time.LocalDateTime;
 
 @Builder
 public record CreateAndUpdateTaskRequestDto(
-        @NotNull(message = "{task.title.required}")
-        @NotBlank(message = "{task.title.not.blank}")
-        @Size(min = 3, message = "{task.title.too.short}")
-        @Size(max = 255, message = "{task.title.too.long}")
+
+        @NotNull(message = "Task title is required.")
+        @NotBlank(message = "Task title must not be blank.")
+        @Size(min = 3, message = "Task title must be at least 3 characters long.")
+        @Size(max = 255, message = "Task title must not exceed 255 characters.")
         String title,
-        @NotNull(message = "{task.description.required}")
-        @NotBlank(message = "{task.description.not.blank}")
-        @Size(min = 3, message = "{task.description.too.short}")
-        @Size(max = 255, message = "{task.description.too.long}")
+        @NotNull(message = "Task description is required.")
+        @NotBlank(message = "Task description must not be blank.")
+        @Size(min = 3, message = "Task description must be at least 3 characters long.")
+        @Size(max = 255, message = "Task description must not exceed 255 characters.")
         String description,
-        @NotNull(message = "{task.endDate.required}")
+        @NotNull(message = "Task end date is required.")
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'hh:mm:ssZ", iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime endDate,
-        @NotNull(message = "{task.assignedTo.required}")
-        @Positive(message = "{task.assignedTo.positive}")
+        @NotNull(message = "Task assigned to is required.")
+        @Positive(message = "Task assigned to must be a positive number.")
         Long assignedTo
+
 ) {
 }
