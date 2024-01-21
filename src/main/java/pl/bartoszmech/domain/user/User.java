@@ -20,6 +20,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "users")
 @Getter
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -79,5 +80,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
 

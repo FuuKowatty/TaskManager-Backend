@@ -26,10 +26,12 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 @RequestMapping("/accounts")
 @AllArgsConstructor
 public class AuthController {
+
     private final JwtAuthenticatorService jwtAuthenticatorService;
     private final UserService userService;
+
     @PostMapping("/token")
-    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
+    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
         return ResponseEntity.status(OK).body(UserMapper.mapToTokenResponse(jwtDto));
     }
@@ -39,4 +41,5 @@ public class AuthController {
         CreateAndUpdateUserRequestDto inputAdmin = UserMapper.mapToCreateAdminRequest(user);
         return ResponseEntity.status(CREATED).body(userService.registerAdmin(inputAdmin));
     }
+
 }

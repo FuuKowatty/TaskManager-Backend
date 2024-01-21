@@ -11,8 +11,10 @@ import java.util.Optional;
 import java.util.Random;
 
 public interface TaskRepository {
+
     Task save(Task entity);
     Optional<Task> findById(Long id);
     List<Task> findAll();
     void deleteById(Long id);
+
 }

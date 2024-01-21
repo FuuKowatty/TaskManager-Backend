@@ -10,6 +10,7 @@ import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @NoArgsConstructor
 public class TaskMapper {
+
     public static TaskResponseDto mapFromTask(Task savedTask) {
         return TaskResponseDto.builder()
                 .id(savedTask.getId())
@@ -72,4 +73,5 @@ public class TaskMapper {
                 .assignedTo(requestedTask.assignedTo())
                 .build();
     }
+
 }

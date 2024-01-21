@@ -34,6 +34,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
+
     private final UserService userService;
     private final AuthorizationService authorizationService;
     private final TaskService taskService;
@@ -79,5 +80,6 @@ public class UserController {
         List<CompletedTasksStatisticResponseDto> statistics = employeeAnalysisService.sortEmployeesByCompletedTasks(employees, completedTasks, lastMonths);
         return ResponseEntity.ok(statistics);
     }
+
 }
 

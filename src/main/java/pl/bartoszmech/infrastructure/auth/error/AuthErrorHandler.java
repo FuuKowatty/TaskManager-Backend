@@ -14,7 +14,9 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
 public class AuthErrorHandler {
+
     private static final String BAD_CREDENTIALS = "Bad Credentials";
+
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseBody
     public ResponseEntity<AuthErrorResponseBody> handleBadCredentials() {
@@ -32,4 +34,5 @@ public class AuthErrorHandler {
     public ResponseEntity<AuthErrorResponseBody> handleInvalidPermission(UnauthorizedAccessException error) {
         return ResponseEntity.status(FORBIDDEN).body(new AuthErrorResponseBody(error.getMessage()));
     }
+
 }

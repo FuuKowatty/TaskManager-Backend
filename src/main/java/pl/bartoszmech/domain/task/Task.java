@@ -19,6 +19,7 @@ import static pl.bartoszmech.domain.task.TaskStatus.FAILED;
 @Entity
 @Table(name = "tasks")
 public class Task {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -30,6 +31,7 @@ public class Task {
     private LocalDateTime endDate;
     private LocalDateTime completedAt;
     private Long assignedTo;
+
 
     public Task(Long id, String title, String description, TaskStatus status, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime completedAt, Long assignedTo) {
         this.id = id;
@@ -79,4 +81,5 @@ public class Task {
     public void fail() {
         this.status = FAILED;
     }
+
 }

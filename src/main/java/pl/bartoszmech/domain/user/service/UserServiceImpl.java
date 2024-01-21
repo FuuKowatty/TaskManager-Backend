@@ -19,10 +19,10 @@ import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private static final String EMAIL_TAKEN = "User email is taken";
     private static final String USER_NOT_FOUND = "User with provided id could not be found";
     private static final String USER_NOT_FOUND_BY_EMAIL = "User with provided email could not be found";
-
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
@@ -102,4 +102,5 @@ public class UserServiceImpl implements UserService {
             throw new EmailTakenException(EMAIL_TAKEN);
         }
     }
+
 }

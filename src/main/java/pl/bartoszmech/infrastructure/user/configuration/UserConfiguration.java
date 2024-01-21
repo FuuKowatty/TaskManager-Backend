@@ -9,8 +9,10 @@ import pl.bartoszmech.domain.user.service.UserServiceImpl;
 
 @Configuration
 public class UserConfiguration {
+
     @Bean
     public UserService createUserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         return new UserServiceImpl(repository, passwordEncoder);
     }
+
 }
