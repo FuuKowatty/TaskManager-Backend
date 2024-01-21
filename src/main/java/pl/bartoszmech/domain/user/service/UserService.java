@@ -7,6 +7,7 @@ import pl.bartoszmech.domain.user.dto.UserDto;
 import java.util.List;
 
 public interface UserService {
+
     UserDto findByEmail(String email);
     UserResponseDto createUser(CreateAndUpdateUserRequestDto inputUser);
     List<UserResponseDto> listUsers();
@@ -15,4 +16,5 @@ public interface UserService {
     UserResponseDto findById(Long id);
     UserResponseDto updateUser(Long id, CreateAndUpdateUserRequestDto userRequestDto);
     UserResponseDto registerAdmin(CreateAndUpdateUserRequestDto inputUser);
+
 }

@@ -10,4 +10,5 @@ public class UserDetailsConfig {
     public org.springframework.security.core.userdetails.UserDetailsService userDetailsService(UserService loginAndRegisterFacade) {
         return new UserDetailsService(loginAndRegisterFacade);
     }
+
 }

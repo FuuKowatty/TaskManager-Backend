@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
-import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.domain.task.AdjustableClock;
 import pl.bartoszmech.domain.task.TaskRepositoryTestImpl;
 import pl.bartoszmech.domain.task.service.TaskService;
@@ -60,7 +60,7 @@ public class TaskStatisticsTest {
         clock.plusMonths(3);
         taskService.listTasks().forEach(task -> taskService.completeTask(task.id()));
         //when
-        List<CompletedTasksByAssignedtoResponseDto> completedTasksByAssignedTo = taskService.getCompletedTasksByAssignedTo(3);
+        List<CompletedTasksByAssignedToResponseDto> completedTasksByAssignedTo = taskService.getCompletedTasksByAssignedTo(3);
         //then
         int allCompletedTasks = completedTasksByAssignedTo.stream()
                 .reduce(0, (acc, obj) -> acc + obj.numberOfCompletedTasks(), Integer::sum);
@@ -73,7 +73,7 @@ public class TaskStatisticsTest {
         //given
         clock.plusMonths(3);
         //when
-        List<CompletedTasksByAssignedtoResponseDto> completedTasksByAssignedTo = taskService.getCompletedTasksByAssignedTo(3);
+        List<CompletedTasksByAssignedToResponseDto> completedTasksByAssignedTo = taskService.getCompletedTasksByAssignedTo(3);
         //then
         assertThat(completedTasksByAssignedTo).isEmpty();
     }
@@ -84,7 +84,7 @@ public class TaskStatisticsTest {
         clock.plusMonths(3);
         taskService.markAsFailedOutdatedTasks();
         //when
-        List<CompletedTasksByAssignedtoResponseDto> completedTasksByAssignedTo = taskService.getCompletedTasksByAssignedTo(3);
+        List<CompletedTasksByAssignedToResponseDto> completedTasksByAssignedTo = taskService.getCompletedTasksByAssignedTo(3);
         //then
         assertThat(completedTasksByAssignedTo).isEmpty();
 

@@ -9,28 +9,30 @@ import pl.bartoszmech.domain.user.UserRoles;
 
 @Builder
 public record CreateAndUpdateUserRequestDto(
-        @NotNull(message = "{user.firstName.required}")
-        @NotBlank(message = "{user.firstName.not.blank}")
-        @Pattern(regexp = "^[a-zA-Z]+$", message = "{user.firstName.invalid}")
-        @Size(min = 2, message = "{user.firstName.too.short}")
-        @Size(max = 50, message = "{user.firstName.too.long}")
+
+        @NotNull(message = "First name is required.")
+        @NotBlank(message = "First name must not be blank.")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "First name must be alphanumeric.")
+        @Size(min = 2, message = "First name must be at least 2 characters long.")
+        @Size(max = 50, message = "First name must not exceed 50 characters.")
         String firstName,
-        @NotNull(message = "{user.lastName.required}")
-        @NotBlank(message = "{user.lastName.not.blank}")
-        @Pattern(regexp = "^[a-zA-Z]+$", message = "{user.lastName.invalid}")
-        @Size(min = 2, message = "{user.lastName.too.short}")
-        @Size(max = 50, message = "{user.lastName.too.long}")
+        @NotNull(message = "Last name is required.")
+        @NotBlank(message = "Last name must not be blank.")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "Last name must be alphanumeric.")
+        @Size(min = 2, message = "Last name must be at least 2 characters long.")
+        @Size(max = 50, message = "Last name must not exceed 50 characters.")
         String lastName,
-        @NotNull(message = "{user.email.required}")
-        @NotBlank(message = "{user.email.not.blank}")
-        @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", message = "{user.email.invalid}")
+        @NotNull(message = "Email is required.")
+        @NotBlank(message = "Email must not be blank.")
+        @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", message = "Email must be a valid email address.")
         String email,
-        @NotNull(message = "{user.password.required}")
-        @NotBlank(message = "{user.password.not.blank}")
-        @Size(min = 6, message = "{user.password.too.short}")
-        @Size(max = 50, message = "{user.password.too.long}")
+        @NotNull(message = "Password is required.")
+        @NotBlank(message = "Password must not be blank.")
+        @Size(min = 6, message = "Password must be at least 6 characters long.")
+        @Size(max = 50, message = "Password must not exceed 50 characters.")
         String password,
-        @NotNull(message = "{user.role.required}")
+        @NotNull(message = "User role is required.")
         UserRoles role
+
 ) {
 }

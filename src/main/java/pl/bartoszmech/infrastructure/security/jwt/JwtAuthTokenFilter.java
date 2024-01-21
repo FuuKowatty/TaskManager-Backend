@@ -22,10 +22,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @AllArgsConstructor
-public class JwtAuthTokenFilter extends OncePerRequestFilter
-{
+public class JwtAuthTokenFilter extends OncePerRequestFilter {
+
     private final JwtConfigurationProperties properties;
-    UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
@@ -50,4 +51,5 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter
         Collection<? extends GrantedAuthority> authorities = this.userDetailsService.loadUserByUsername(userEmail).getAuthorities();
         return new UsernamePasswordAuthenticationToken(userEmail, null, authorities);
     }
+
 }

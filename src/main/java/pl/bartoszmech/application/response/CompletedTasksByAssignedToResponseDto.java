@@ -1,9 +1,8 @@
 package pl.bartoszmech.application.response;
 
-public record CompletedTasksStatisticResponseDto(
+public record CompletedTasksByAssignedToResponseDto(
 
-        UserResponseDto user,
-
+        Long assignedTo,
         Integer numberOfCompletedTasks)
 
 {}

@@ -49,4 +49,5 @@ public class JwtAuthenticatorService {
                 .withIssuer(issuer)
                 .sign(algorithm);
     }
+
 }

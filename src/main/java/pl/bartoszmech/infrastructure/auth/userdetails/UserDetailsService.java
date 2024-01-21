@@ -26,4 +26,5 @@ public class UserDetailsService implements org.springframework.security.core.use
                 user.password(),
                 List.of(new SimpleGrantedAuthority(user.role().getRoleName())));
     }
+
 }

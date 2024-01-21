@@ -22,12 +22,13 @@ import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 
 @Component
 class TestcontainersInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:14.1");
+
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.1");
 
     static {
         postgres.start();
     }
+
     @Override
     public void initialize(ConfigurableApplicationContext ctx) {
         TestPropertyValues.of(
@@ -44,7 +45,7 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
 
     @EventListener(ContextRefreshedEvent.class)
     public void onBootApp() {
-        //Id is reserved 1-ADMIN, 2-MANAGER, (3-5)-EMPLOYEE
+        //ID is reserved 1-ADMIN, 2-MANAGER, (3-5)-EMPLOYEE
         Arrays.asList(
                 new User(1L,"John" , "Doe", "JohnDoe@example.com", "123456", ADMIN),
                 new User(2L,"Jane" , "Doe", "JaneDoe@example.com", "123456", MANAGER),
@@ -62,4 +63,5 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
                 new Task(5L, "Resolve customer support tickets", "Respond to customer inquiries, investigate issues, and provide solutions to resolve customer support tickets", FAILED, LocalDateTime.now().minusDays(4), LocalDateTime.now().plusDays(3), null, 4L)
         ).forEach(task -> taskRepository.save(task));
     }
+
 }

@@ -15,13 +15,12 @@ public record TaskInfoResponseDto(String message, HttpStatus status) {
         return new TaskInfoResponseDto(TASK_CREATED_SUCCESSFULLY, OK);
     }
 
-
     public static TaskInfoResponseDto TASK_OUTDATED() {
         return new TaskInfoResponseDto(TASK_IS_OUTDATED, FORBIDDEN);
     }
 
-
     public static TaskInfoResponseDto TASK_ALREADY_COMPLETED() {
         return new TaskInfoResponseDto(TASK_IS_ALREADY_COMPLETED, FORBIDDEN);
     }
+
 }

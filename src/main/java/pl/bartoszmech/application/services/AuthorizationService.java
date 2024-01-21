@@ -15,12 +15,13 @@ import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 @Service
 @AllArgsConstructor
 public class AuthorizationService {
+
     private static final String TASK_NOT_ASSIGNED_FOR_THIS_EMPLOYEE = "You dont have permission to read task with id: ";
     public static final String TASK_NOT_ASSIGNED_TO_EMPLOYEE = "Invalid assignedTo, task should be assigned to user with role employee but was: ";
     private static final String ADMIN_CREATION_NOT_ALLOWED = "Admin cannot create other admin, please authenticate via valid endpoint";
     public static final String EMPLOYEE_TRYING_READ_NOT_HIS_TASKS = "You dont have permission to read tasks of employee with id: ";
 
-    UserService userService;
+    private final UserService userService;
     public void hasUserPermissionToReadTaskWithId(long taskId,  long assignedTo) {
         UserDto user = findAuthenticatedUser();
         if (user.role().equals(EMPLOYEE) && assignedTo != user.id()) {
@@ -52,4 +53,5 @@ public class AuthorizationService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userService.findByEmail(auth.getName());
     }
+
 }

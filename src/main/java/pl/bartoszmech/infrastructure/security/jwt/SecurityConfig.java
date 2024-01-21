@@ -8,12 +8,11 @@
     import org.springframework.security.config.annotation.web.builders.HttpSecurity;
     import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
     import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-    import org.springframework.security.crypto.password.PasswordEncoder;
     import org.springframework.security.web.SecurityFilterChain;
     import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
     import static org.springframework.http.HttpMethod.GET;
+    import static org.springframework.http.HttpMethod.OPTIONS;
     import static org.springframework.http.HttpMethod.PATCH;
     import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
     import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
@@ -42,17 +41,13 @@
         }
 
         @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder();
-        }
-
-
-        @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
             httpSecurity
+                    .cors(AbstractHttpConfigurer::disable)
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeRequests(
                             auth -> auth
+                                    .requestMatchers(OPTIONS,"/**").permitAll()
                                     .requestMatchers(WHITE_LIST_URL).permitAll()
                                     .requestMatchers(PATCH,"/api/tasks/{id}/complete").hasAnyAuthority(EMPLOYEE.getRoleName())
                                         .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())

@@ -10,7 +10,8 @@ import pl.bartoszmech.domain.task.service.TaskService;
 @AllArgsConstructor
 @Log4j2
 public class TaskStatusScheduler  {
-    private TaskService service;
+
+    private final TaskService service;
 
     @Scheduled(fixedDelayString = "${task.status.update.delay}")
     public void updateTaskStatus() {
@@ -18,6 +19,5 @@ public class TaskStatusScheduler  {
         service.markAsFailedOutdatedTasks();
         log.info("Task status updated");
     }
-
 
 }

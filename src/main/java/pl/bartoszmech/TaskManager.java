@@ -8,7 +8,9 @@ import pl.bartoszmech.infrastructure.security.jwt.JwtConfigurationProperties;
 @SpringBootApplication
 @EnableConfigurationProperties(value = JwtConfigurationProperties.class)
 public class TaskManager {
+
     public static void main(String[] args) {
         SpringApplication.run(TaskManager.class, args);
     }
+
 }

@@ -1,6 +1,6 @@
 package pl.bartoszmech.domain.task.service;
 
-import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
 import pl.bartoszmech.application.response.TaskInfoResponseDto;
 import pl.bartoszmech.application.response.TaskResponseDto;
@@ -8,6 +8,7 @@ import pl.bartoszmech.application.response.TaskResponseDto;
 import java.util.List;
 
 public interface TaskService {
+
     TaskResponseDto createTask(CreateAndUpdateTaskRequestDto taskRequestDto);
     List<TaskResponseDto> listTasks();
     TaskResponseDto findById(long id);
@@ -15,6 +16,7 @@ public interface TaskService {
     TaskResponseDto updateTask(long id, CreateAndUpdateTaskRequestDto taskRequestDto);
     List<TaskResponseDto> listEmployeeTasks(long id);
     TaskInfoResponseDto completeTask(long id);
-    List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths);
+    List<CompletedTasksByAssignedToResponseDto> getCompletedTasksByAssignedTo(int lastMonths);
     void markAsFailedOutdatedTasks();
+
 }

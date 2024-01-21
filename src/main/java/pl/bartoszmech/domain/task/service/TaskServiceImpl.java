@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
 import pl.bartoszmech.application.request.CreateAndUpdateTaskRequestDto;
-import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.application.response.TaskInfoResponseDto;
 import pl.bartoszmech.application.response.TaskResponseDto;
 
@@ -33,13 +33,11 @@ import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 @AllArgsConstructor
 @Log4j2
 public class TaskServiceImpl implements TaskService {
+
     private static final String TASK_DUPLICATE = "Provided task is already assigned to this same user";
     private  static final String INVALID_DATE_ORDER = "Provided invalid dates order";
     private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
-
-
     private final TaskRepository repository;
-
     private final Clock clock;
 
     @Override
@@ -83,7 +81,6 @@ public class TaskServiceImpl implements TaskService {
         return TASK_ALREADY_COMPLETED();
     }
 
-
     @Override
     public TaskResponseDto findById(long id) {
         return TaskMapper.mapFromTask(findEntityById(id));
@@ -104,16 +101,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDto updateTask(long id, CreateAndUpdateTaskRequestDto requestedTask) {
         TaskResponseDto foundTask = findById(id);
-        TaskResponseDto inputTask = TaskResponseDto.builder()
-                .id(foundTask.id())
-                .title(requestedTask.title())
-                .description(requestedTask.description())
-                .startDate(foundTask.startDate())
-                .endDate(requestedTask.endDate())
-                .completedAt(foundTask.completedAt())
-                .status(foundTask.status())
-                .assignedTo(requestedTask.assignedTo())
-                .build();
+        TaskResponseDto inputTask = TaskMapper.mapFromTaskUpdate(requestedTask, foundTask);
         validateIfTaskCanBeCreated(inputTask);
         return TaskMapper.mapFromTask(
                 repository.save(TaskMapper.mapToTask(inputTask))
@@ -121,12 +109,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<CompletedTasksByAssignedtoResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
+    public List<CompletedTasksByAssignedToResponseDto> getCompletedTasksByAssignedTo(int lastMonths) {
         LocalDateTime taskEndDateRange = getNow().minusMonths(lastMonths);
         List<TaskResponseDto> tasksFromLastSixMonths = getTasksFromLastSixMonths(taskEndDateRange);
         Map<Long, Integer> tasksByAssignedTo = groupByAssignedToAndCountCompletedTasks(tasksFromLastSixMonths);
         return tasksByAssignedTo.entrySet().stream()
-                .map(entry -> new CompletedTasksByAssignedtoResponseDto(entry.getKey(), entry.getValue()))
+                .map(entry -> new CompletedTasksByAssignedToResponseDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -150,7 +138,6 @@ public class TaskServiceImpl implements TaskService {
             throw new DuplicateUserTaskException(TASK_DUPLICATE);
         }
     }
-
 
     private void checkIfStartDateIfBeforeEndDate(LocalDateTime startDate, LocalDateTime endDate) {
         if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
@@ -181,4 +168,5 @@ public class TaskServiceImpl implements TaskService {
     private LocalDateTime getNow() {
         return LocalDateTime.now(clock);
     }
+
 }

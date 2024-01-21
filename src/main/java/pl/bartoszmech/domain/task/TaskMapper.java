@@ -10,6 +10,7 @@ import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 
 @NoArgsConstructor
 public class TaskMapper {
+
     public static TaskResponseDto mapFromTask(Task savedTask) {
         return TaskResponseDto.builder()
                 .id(savedTask.getId())
@@ -59,4 +60,18 @@ public class TaskMapper {
                 .assignedTo(requestedTask.assignedTo())
                 .build();
     }
+
+    public static TaskResponseDto mapFromTaskUpdate(CreateAndUpdateTaskRequestDto requestedTask, TaskResponseDto persistedTask ) {
+        return TaskResponseDto.builder()
+                .id(persistedTask.id())
+                .title(requestedTask.title())
+                .description(requestedTask.description())
+                .startDate(persistedTask.startDate())
+                .endDate(requestedTask.endDate())
+                .completedAt(persistedTask.completedAt())
+                .status(persistedTask.status())
+                .assignedTo(requestedTask.assignedTo())
+                .build();
+    }
+
 }

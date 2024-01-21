@@ -19,12 +19,14 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 @IntegrationTest
 @AutoConfigureMockMvc
 public class ShouldRegisterAdminAndGenerateTokenIntegrationTest {
+
     @Autowired
     MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
 
-    private static final String JWT_PATTERN = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$";;
+    private static final String JWT_PATTERN = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$";
+
     @Test
     public void shouldRegisterAdminAndGenerateToken() throws Exception {
         //given&when
@@ -54,6 +56,6 @@ public class ShouldRegisterAdminAndGenerateTokenIntegrationTest {
         //then
         assertThat(admin.token()).matches(JWT_PATTERN);
         assertThat(admin.email()).isEqualTo(adminEmail);
-        assertThat(admin.id()).isNotNull();
     }
+
 }

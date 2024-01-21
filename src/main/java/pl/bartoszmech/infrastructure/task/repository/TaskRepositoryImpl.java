@@ -11,23 +11,28 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Component
-@Primary
 public class TaskRepositoryImpl implements TaskRepository {
-    PostgreSQLTaskRepository repository;
+
+    private final PostgreSQLTaskRepository repository;
+
     @Override
     public Task save(Task entity) {
         return repository.save(entity);
     }
+
     @Override
     public Optional<Task> findById(Long id) {
         return repository.findById(id);
     }
+
     @Override
     public List<Task> findAll() {
         return repository.findAll();
     }
+
     @Override
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
+    
 }

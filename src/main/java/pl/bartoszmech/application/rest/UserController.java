@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
-import pl.bartoszmech.application.response.CompletedTasksByAssignedtoResponseDto;
+import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.application.services.EmployeeAnalysisService;
 import pl.bartoszmech.domain.task.service.TaskService;
+import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ParameterValidation;
 import pl.bartoszmech.application.services.AuthorizationService;
@@ -33,14 +34,14 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
-    UserService userService;
-    AuthorizationService authorizationService;
-    PasswordEncoder passwordEncoder;
-    TaskService taskService;
-    EmployeeAnalysisService employeeAnalysisService;
+
+    private final UserService userService;
+    private final AuthorizationService authorizationService;
+    private final TaskService taskService;
+    private final EmployeeAnalysisService employeeAnalysisService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> list() {
+    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
         return ResponseEntity.status(OK).body(userService.listUsers());
     }
 
@@ -52,13 +53,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDto> create(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(CREATED).body(userService.createUser(CreateAndUpdateUserRequestDto.builder()
-                .firstName(requestDto.firstName())
-                .lastName(requestDto.lastName())
-                .email(requestDto.email())
-                .password(passwordEncoder.encode(requestDto.password()))
-                .role(requestDto.role())
-                .build()));
+        return ResponseEntity.status(CREATED).body(userService.createUser(UserMapper.mapToCreateAndUpdateRequest(requestDto)));
     }
 
     @DeleteMapping("/{id}")
@@ -68,7 +63,8 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
-        return ResponseEntity.status(OK).body(userService.updateUser(id, requestDto));    }
+        return ResponseEntity.status(OK).body(userService.updateUser(id, requestDto));
+    }
 
     @GetMapping("/stats/sorted-by-completed-tasks")
     public ResponseEntity<List<CompletedTasksStatisticResponseDto>> listBestEmployee(@RequestParam(
@@ -78,11 +74,12 @@ public class UserController {
     ) int lastMonths) {
         ParameterValidation.validateLastMonths(lastMonths);
 
-        List<CompletedTasksByAssignedtoResponseDto> completedTasks = taskService.getCompletedTasksByAssignedTo(lastMonths);
+        List<CompletedTasksByAssignedToResponseDto> completedTasks = taskService.getCompletedTasksByAssignedTo(lastMonths);
         List<UserResponseDto> employees = userService.listEmployees();
 
         List<CompletedTasksStatisticResponseDto> statistics = employeeAnalysisService.sortEmployeesByCompletedTasks(employees, completedTasks, lastMonths);
         return ResponseEntity.ok(statistics);
     }
+
 }
 

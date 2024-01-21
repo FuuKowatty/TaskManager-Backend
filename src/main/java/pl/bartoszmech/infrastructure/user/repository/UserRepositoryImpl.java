@@ -13,7 +13,8 @@ import java.util.Optional;
 @Component
 @Primary
 public class UserRepositoryImpl implements UserRepository {
-    PostgreSQLUserRepository repository;
+
+    private final PostgreSQLUserRepository repository;
 
     @Override
     public Optional<User> findByEmail(String email) {
@@ -44,4 +45,5 @@ public class UserRepositoryImpl implements UserRepository {
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
+
 }
