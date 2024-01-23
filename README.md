@@ -7,6 +7,7 @@ All logic is based on two domains: user and task.
 
 The application is based on DDD (Domain Driven Design) with hexagonal architecture, so we have a clear direction between client scope, business logic and implementations.
 
+Checkout out swagger!: http://ec2-16-171-206-207.eu-north-1.compute.amazonaws.com:8000/swagger-ui/index.html
 
 ## Architecture
 ![Architecture](./architecture/architecture-v1.png)
@@ -35,6 +36,7 @@ The application is based on DDD (Domain Driven Design) with hexagonal architectu
 
 ## Technologies
 
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
 ![Java 17](https://img.shields.io/badge/Java_17-007396?style=for-the-badge&logo=java&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
