@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
 import pl.bartoszmech.application.response.CompletedTasksStatisticResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 
 import java.util.Comparator;
 import java.util.List;
@@ -28,7 +29,7 @@ public class EmployeeAnalysisService {
         UserResponseDto user = employees.stream()
                 .filter(employee -> employee.id().equals(task.assignedTo()))
                 .findFirst()
-                .orElseThrow();
+                .orElse(null);
         return new CompletedTasksStatisticResponseDto(user, task.numberOfCompletedTasks());
     }
 
