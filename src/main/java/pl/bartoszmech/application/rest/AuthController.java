@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.UserMapper;
-import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
@@ -25,11 +22,8 @@ import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
 import pl.bartoszmech.infrastructure.security.jwt.JwtAuthenticatorService;
 
-import javax.naming.AuthenticationException;
-
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 
 @RestController
 @RequestMapping("/accounts")
@@ -47,7 +41,7 @@ public class AuthController {
                             schema = @Schema(implementation = ValidationResponse.class)))
     })
     @PostMapping("/token")
-    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid@RequestBody TokenRequestDto tokenRequestDto) {
+    public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
         return ResponseEntity.status(OK).body(UserMapper.mapToTokenResponse(jwtDto));
     }
@@ -64,4 +58,5 @@ public class AuthController {
         CreateAndUpdateUserRequestDto inputAdmin = UserMapper.mapToCreateAdminRequest(user);
         return ResponseEntity.status(CREATED).body(userService.registerAdmin(inputAdmin));
     }
+
 }

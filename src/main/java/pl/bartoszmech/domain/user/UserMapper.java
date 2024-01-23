@@ -11,6 +11,7 @@ import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 
 @NoArgsConstructor
 public class UserMapper {
+
     public static UserDto mapFromUser(User savedTask) {
         return new UserDto(
                 savedTask.getId(),
@@ -52,4 +53,5 @@ public class UserMapper {
                 .email(jwtDto.username())
                 .build();
     }
+
 }

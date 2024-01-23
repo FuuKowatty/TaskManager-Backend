@@ -55,4 +55,5 @@ public class ValidationErrorHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList();
     }
+
 }

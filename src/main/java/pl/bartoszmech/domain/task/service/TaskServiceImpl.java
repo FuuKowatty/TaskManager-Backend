@@ -33,13 +33,11 @@ import static pl.bartoszmech.domain.task.TaskStatus.PENDING;
 @AllArgsConstructor
 @Log4j2
 public class TaskServiceImpl implements TaskService {
+
     private static final String TASK_DUPLICATE = "Provided task is already assigned to this same user";
     private  static final String INVALID_DATE_ORDER = "Provided invalid dates order";
     private static final String TASK_NOT_FOUND = "Task with provided id could not be found";
-
-
     private final TaskRepository repository;
-
     private final Clock clock;
 
     @Override
@@ -82,7 +80,6 @@ public class TaskServiceImpl implements TaskService {
         }
         return TASK_ALREADY_COMPLETED();
     }
-
 
     @Override
     public TaskResponseDto findById(long id) {
@@ -142,7 +139,6 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-
     private void checkIfStartDateIfBeforeEndDate(LocalDateTime startDate, LocalDateTime endDate) {
         if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
             log.error(startDate + "cant be after or this same as " + endDate);
@@ -172,4 +168,5 @@ public class TaskServiceImpl implements TaskService {
     private LocalDateTime getNow() {
         return LocalDateTime.now(clock);
     }
+
 }

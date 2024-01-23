@@ -10,8 +10,10 @@ import java.time.Clock;
 
 @Configuration
 public class TaskConfiguration {
+
     @Bean
     public TaskService createTaskService(TaskRepository repository, Clock clock) {
         return new TaskServiceImpl(repository, clock);
     }
+
 }

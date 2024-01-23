@@ -13,6 +13,7 @@ import java.util.Optional;
 @Component
 @Primary
 public class UserRepositoryImpl implements UserRepository {
+
     private final PostgreSQLUserRepository repository;
 
     @Override
@@ -44,4 +45,5 @@ public class UserRepositoryImpl implements UserRepository {
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
+
 }

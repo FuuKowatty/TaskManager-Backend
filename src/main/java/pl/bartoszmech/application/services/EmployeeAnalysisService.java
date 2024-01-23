@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 public class EmployeeAnalysisService {
+
     public List<CompletedTasksStatisticResponseDto> sortEmployeesByCompletedTasks(List<UserResponseDto> employees, List<CompletedTasksByAssignedToResponseDto>  tasks, int lastMonths) {
         List<CompletedTasksStatisticResponseDto> employeeStatisticDtoList = mapToEmployeeStatistics(tasks, employees);
         return sortEmployeeStatistics(employeeStatisticDtoList);
@@ -39,4 +40,5 @@ public class EmployeeAnalysisService {
                         .reversed())
                 .toList();
     }
+
 }

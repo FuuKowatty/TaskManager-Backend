@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record TaskResponseDto(
+
         Long id,
         String title,
         String description,
@@ -15,5 +16,6 @@ public record TaskResponseDto(
         LocalDateTime endDate,
         LocalDateTime completedAt,
         Long assignedTo
+
 ) {
 }

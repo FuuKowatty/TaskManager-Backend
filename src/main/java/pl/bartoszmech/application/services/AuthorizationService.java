@@ -15,6 +15,7 @@ import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 @Service
 @AllArgsConstructor
 public class AuthorizationService {
+
     private static final String TASK_NOT_ASSIGNED_FOR_THIS_EMPLOYEE = "You dont have permission to read task with id: ";
     public static final String TASK_NOT_ASSIGNED_TO_EMPLOYEE = "Invalid assignedTo, task should be assigned to user with role employee but was: ";
     private static final String ADMIN_CREATION_NOT_ALLOWED = "Admin cannot create other admin, please authenticate via valid endpoint";
@@ -52,4 +53,5 @@ public class AuthorizationService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userService.findByEmail(auth.getName());
     }
+
 }
