@@ -46,11 +46,9 @@ public class UserMapper {
                     .build();
     }
 
-
-    public static TokenResponseDto mapToTokenResponse(JwtResponseDto jwtDto) {
+    public static TokenResponseDto mapToTokenResponse(String token) {
         return TokenResponseDto.builder()
-                .token(jwtDto.token())
-                .email(jwtDto.username())
+                .token(token)
                 .build();
     }
 

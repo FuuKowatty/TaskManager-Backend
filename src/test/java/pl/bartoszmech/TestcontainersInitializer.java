@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.testcontainers.containers.PostgreSQLContainer;
 import pl.bartoszmech.domain.task.Task;
@@ -42,14 +43,16 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
     private UserRepository userRepository;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @EventListener(ContextRefreshedEvent.class)
     public void onBootApp() {
         //ID is reserved 1-ADMIN, 2-MANAGER, (3-5)-EMPLOYEE
         Arrays.asList(
-                new User(1L,"John" , "Doe", "JohnDoe@example.com", "123456", ADMIN),
+                new User(1L,"John" , "Doe", "admin@example.com", passwordEncoder.encode("123456"), ADMIN),
                 new User(2L,"Jane" , "Doe", "JaneDoe@example.com", "123456", MANAGER),
-                new User(3L,"Peter" , "Jones", "PeterJones@example.com", "123456", EMPLOYEE),
+                new User(3L,"Peter" , "Jones", "PeterJones@example.com", passwordEncoder.encode("123456"), EMPLOYEE),
                 new User(4L,"Mary" , "Smith", "MarySmith@example.com", "123456", EMPLOYEE),
                 new User(5L,"Michael" , "Brown", "MichaelBrown@example.com", "123456", EMPLOYEE)
         ).forEach(user -> userRepository.save(user));

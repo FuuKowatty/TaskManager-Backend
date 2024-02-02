@@ -9,6 +9,7 @@ import pl.bartoszmech.IntegrationTest;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
+import pl.bartoszmech.application.response.UserResponseDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -29,20 +30,22 @@ public class ShouldRegisterAdminAndGenerateTokenIntegrationTest {
 
     @Test
     public void shouldRegisterAdminAndGenerateToken() throws Exception {
-        //given&when
+        //given
         String adminEmail = "admin@gmail.com";
         String adminPassword = "zaq1@WSX";
+        CreateAndUpdateUserRequestDto user = CreateAndUpdateUserRequestDto.builder()
+                .firstName("Dany")
+                .lastName("Abramov")
+                .email(adminEmail)
+                .password(adminPassword)
+                .role(ADMIN)
+                .build();
+
+        //when
         mockMvc.perform(post("/accounts/register")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
-                                .firstName("Dany")
-                                .lastName("Abramov")
-                                .email(adminEmail)
-                                .password(adminPassword)
-                                .role(ADMIN)
-                                .build())))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isCreated());
 
         TokenResponseDto admin = objectMapper.readValue(mockMvc.perform(post("/accounts/token")
                         .contentType(APPLICATION_JSON_VALUE)
@@ -55,7 +58,6 @@ public class ShouldRegisterAdminAndGenerateTokenIntegrationTest {
 
         //then
         assertThat(admin.token()).matches(JWT_PATTERN);
-        assertThat(admin.email()).isEqualTo(adminEmail);
     }
 
 }

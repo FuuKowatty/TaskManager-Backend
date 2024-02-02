@@ -50,8 +50,18 @@ public class AuthorizationService {
     }
 
     private UserDto findAuthenticatedUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return userService.findByEmail(auth.getName());
+        return userService
+                .findByEmail(SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName());
     }
 
+    public void checkIfHasPermissionToViewUserData(Long id) {
+        UserDto user = findAuthenticatedUser();
+        if(user.role().equals(ADMIN) || user.id().equals(id)) {
+            return;
+        }
+        throw new UnauthorizedAccessException("You dont have permission to view user data with id: " + id);
+    }
 }

@@ -1,13 +1,16 @@
 package pl.bartoszmech.feature.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import pl.bartoszmech.IntegrationTest;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.response.TokenResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 
@@ -23,6 +26,49 @@ public class ManageUserIntegrationTest {
     MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
+
+
+    @Test
+    public void admin_should_find_user_by_id() throws Exception {
+        //Step 0 login
+        MvcResult loginAdminResponse = mockMvc.perform(post("/accounts/token")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(UserDto.builder()
+                                .email("admin@example.com")
+                                .password("123456")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn();
+        String adminToken = objectMapper.readValue(loginAdminResponse.getResponse().getContentAsString(), TokenResponseDto.class).token();
+
+        MvcResult loginEmployeeResponse = mockMvc.perform(post("/accounts/token")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(UserDto.builder()
+                                .email("PeterJones@example.com")
+                                .password("123456")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn();
+        String employeeToken = objectMapper.readValue(loginEmployeeResponse.getResponse().getContentAsString(), TokenResponseDto.class).token();
+
+        //Step 1 admin should be able to find user by id
+        mockMvc.perform(get("/api/users/" + 2)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+
+        //Step 2 other role than ADMIN should be able to see themselves
+        mockMvc.perform(get("/api/users/" + 3)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .header("Authorization", "Bearer " + employeeToken))
+                .andExpect(status().isOk());
+
+        //Step 3 other role than ADMIN should not be able to see other users
+        mockMvc.perform(get("/api/users/" + 2)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .header("Authorization", "Bearer " + employeeToken))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     @WithMockUser(authorities = {"admin"})
@@ -40,17 +86,13 @@ public class ManageUserIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString(), UserResponseDto.class).id();
 
-        //Step 2: Admin can get user by id
-        mockMvc.perform(get("/api/users/" + createdUserId)
-                        .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
 
-        //Step 3: Admin can get all users
+        //Step 2: Admin can get all users
         mockMvc.perform(get("/api/users")
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
 
-        //Step 4: Admin can update user by id
+        //Step 3: Admin can update user by id
         mockMvc.perform(put("/api/users/" + createdUserId)
                         .contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
@@ -62,7 +104,7 @@ public class ManageUserIntegrationTest {
                                 .build())))
                 .andExpect(status().isOk());
 
-        //Step 5: Admin can delete user by id
+        //Step 4: Admin can delete user by id
         mockMvc.perform(delete("/api/users/" + createdUserId)
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -84,10 +126,10 @@ public class ManageUserIntegrationTest {
                                 .build())))
                 .andExpect(status().isForbidden());
 
-        //Step 2: Manager cant get user by id
+        //Step 2: Manager cant get any other user by id
         mockMvc.perform(get("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
         //Step 3: Manager cant get all users
         mockMvc.perform(get("/api/users")
@@ -127,10 +169,10 @@ public class ManageUserIntegrationTest {
                                 .build())))
                 .andExpect(status().isForbidden());
 
-        //Step 2: Employee cant get user by id
+        //Step 2: Employee cant get any other user by id
         mockMvc.perform(get("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
         //Step 3: Employee cant get all users
         mockMvc.perform(get("/api/users")

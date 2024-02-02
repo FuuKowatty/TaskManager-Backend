@@ -43,7 +43,7 @@ public class AuthController {
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
         final JwtResponseDto jwtDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
-        return ResponseEntity.status(OK).body(UserMapper.mapToTokenResponse(jwtDto));
+        return ResponseEntity.status(OK).body(UserMapper.mapToTokenResponse(jwtDto.token()));
     }
 
     @Operation(summary = "Create account")
