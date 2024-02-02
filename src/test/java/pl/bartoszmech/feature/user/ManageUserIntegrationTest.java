@@ -2,6 +2,7 @@ package pl.bartoszmech.feature.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +15,7 @@ import pl.bartoszmech.application.response.TokenResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,8 +31,8 @@ public class ManageUserIntegrationTest {
 
 
     @Test
-    public void admin_should_find_user_by_id() throws Exception {
-        //Step 0 login
+    public void should_be_able_to_take_their_credentials() throws Exception {
+        //Step: 0 login
         MvcResult loginAdminResponse = mockMvc.perform(post("/accounts/token")
                         .contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(UserDto.builder()
@@ -51,23 +53,26 @@ public class ManageUserIntegrationTest {
                 .andReturn();
         String employeeToken = objectMapper.readValue(loginEmployeeResponse.getResponse().getContentAsString(), TokenResponseDto.class).token();
 
-        //Step 1 admin should be able to find user by id
-        mockMvc.perform(get("/api/users/" + 2)
+        //Step 1: admin should be able to get their credentials
+        MvcResult adminDataRes = mockMvc.perform(get("/accounts/data")
                         .contentType(APPLICATION_JSON_VALUE)
                         .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        UserResponseDto adminData = objectMapper.readValue(adminDataRes.getResponse().getContentAsString(), UserResponseDto.class);
+        assertThat(adminData.id()).isNotNull();
+        assertThat(adminData.email()).isEqualTo("admin@example.com");
 
-        //Step 2 other role than ADMIN should be able to see themselves
-        mockMvc.perform(get("/api/users/" + 3)
+        //Step 2: employee should be able to get their credentials
+        MvcResult employeeDataRes = mockMvc.perform(get("/accounts/data")
                         .contentType(APPLICATION_JSON_VALUE)
                         .header("Authorization", "Bearer " + employeeToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        UserResponseDto employeeData = objectMapper.readValue(employeeDataRes.getResponse().getContentAsString(), UserResponseDto.class);
+        assertThat(employeeData.id()).isNotNull();
+        assertThat(employeeData.email()).isEqualTo("PeterJones@example.com");
 
-        //Step 3 other role than ADMIN should not be able to see other users
-        mockMvc.perform(get("/api/users/" + 2)
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .header("Authorization", "Bearer " + employeeToken))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -129,7 +134,7 @@ public class ManageUserIntegrationTest {
         //Step 2: Manager cant get any other user by id
         mockMvc.perform(get("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
 
         //Step 3: Manager cant get all users
         mockMvc.perform(get("/api/users")
@@ -172,7 +177,7 @@ public class ManageUserIntegrationTest {
         //Step 2: Employee cant get any other user by id
         mockMvc.perform(get("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
 
         //Step 3: Employee cant get all users
         mockMvc.perform(get("/api/users")

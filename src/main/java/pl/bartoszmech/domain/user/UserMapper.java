@@ -22,6 +22,16 @@ public class UserMapper {
                 savedTask.getRole());
     }
 
+    public static UserResponseDto mapToResponseFromDto(UserDto user) {
+        return UserResponseDto.builder()
+                .id(user.id())
+                .firstName(user.firstName())
+                .lastName(user.lastName())
+                .email(user.email())
+                .role(user.role())
+                .build();
+    }
+
     public static UserResponseDto mapToResponse(User user) {
         return new UserResponseDto(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole());
     }

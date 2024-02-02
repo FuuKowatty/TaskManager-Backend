@@ -74,7 +74,6 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findById(@PathVariable("id") long id) {
-        authorizationService.checkIfHasPermissionToViewUserData(id);
         return ResponseEntity.status(OK).body(userService.findById(id));
     }
 

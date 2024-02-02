@@ -8,12 +8,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.application.services.AuthorizationService;
 import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
@@ -31,6 +33,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class AuthController {
 
     private final JwtAuthenticatorService jwtAuthenticatorService;
+    private final AuthorizationService authorizationService;
     private final UserService userService;
 
     @Operation(summary = "Get token for authenticated requests")
@@ -57,6 +60,11 @@ public class AuthController {
     public ResponseEntity<UserResponseDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
         CreateAndUpdateUserRequestDto inputAdmin = UserMapper.mapToCreateAdminRequest(user);
         return ResponseEntity.status(CREATED).body(userService.registerAdmin(inputAdmin));
+    }
+
+    @GetMapping("/data")
+    public ResponseEntity<UserResponseDto> getUserById() {
+        return ResponseEntity.status(OK).body(authorizationService.findAuthenticatedUserWithoutPassword());
     }
 
 }

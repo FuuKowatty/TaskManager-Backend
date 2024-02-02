@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import pl.bartoszmech.application.response.UserResponseDto;
+import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.UserRoles;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
@@ -57,11 +59,12 @@ public class AuthorizationService {
                         .getName());
     }
 
-    public void checkIfHasPermissionToViewUserData(Long id) {
-        UserDto user = findAuthenticatedUser();
-        if(user.role().equals(ADMIN) || user.id().equals(id)) {
-            return;
-        }
-        throw new UnauthorizedAccessException("You dont have permission to view user data with id: " + id);
+    public UserResponseDto findAuthenticatedUserWithoutPassword() {
+        return UserMapper.mapToResponseFromDto(userService
+                .findByEmail(SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()));
     }
+
 }
