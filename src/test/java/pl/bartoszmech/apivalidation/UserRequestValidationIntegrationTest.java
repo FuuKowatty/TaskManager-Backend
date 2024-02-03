@@ -56,7 +56,6 @@ public class UserRequestValidationIntegrationTest {
                         .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
-        System.out.println(responseWhenPassingEmptyValues);
         ValidationResponse createUsersValidationResponse = objectMapper.readValue(responseWhenPassingEmptyValues, ValidationResponse.class);
         assertThat(createUsersValidationResponse.messages()).containsExactlyInAnyOrder(
         "First name must not be blank.",

@@ -25,8 +25,7 @@ public class JwtAuthenticatorService {
     private final JwtConfigurationProperties properties;
 
     public JwtResponseDto authenticateAndGenerateToken(TokenRequestDto loginRequest) {
-        Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+        Authentication authenticate = getAuthenticate(loginRequest);
         User user = (User) authenticate.getPrincipal();
         String token = createToken(user);
         String username = user.getUsername();
@@ -34,6 +33,11 @@ public class JwtAuthenticatorService {
                 .token(token)
                 .username(username)
                 .build();
+    }
+
+    public Authentication getAuthenticate(TokenRequestDto loginRequest) {
+        return  authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
     }
 
     private String createToken(User user) {

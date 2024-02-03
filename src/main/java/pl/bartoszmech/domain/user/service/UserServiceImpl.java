@@ -3,7 +3,9 @@ package pl.bartoszmech.domain.user.service;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.UpdatePasswordRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.EmailTakenException;
 import pl.bartoszmech.domain.user.User;
@@ -11,10 +13,10 @@ import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.repository.UserRepository;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
+import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
 
 import java.util.List;
 
-import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 
 @AllArgsConstructor
@@ -49,6 +51,27 @@ public class UserServiceImpl implements UserService {
         );
     }
 
+    private User updateUserWithoutCredentials(long userId, CreateAndUpdateUserRequestDto inputUser) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
+        user.setFirstName(inputUser.firstName());
+        user.setLastName(inputUser.lastName());
+        user.setRole(inputUser.role());
+        return user;
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(UserDto user, UpdatePasswordRequestDto passwords) {
+        if(passwordEncoder.matches(passwords.oldPassword(), user.password())) {
+            User foundUser = repository.findById(user.id())
+                    .orElseThrow(() -> new ResourceNotFound(USER_NOT_FOUND));
+            foundUser.setPassword(passwordEncoder.encode(passwords.newPassword()));
+        } else {
+            throw new UnauthorizedAccessException("Password does not match");
+        }
+    }
+
     @Override
     public List<UserResponseDto> listUsers() {
         return repository
@@ -79,10 +102,11 @@ public class UserServiceImpl implements UserService {
         return deletedUser;
     }
 
+    @Transactional
     @Override
     public UserResponseDto updateUser(Long id, CreateAndUpdateUserRequestDto inputUser) {
         checkIfEmailIsAlreadyUsedByOtherUser(id, inputUser);
-        return UserMapper.mapToResponse(saveUserWithEncodedPassword(inputUser));
+        return UserMapper.mapToResponse(updateUserWithoutCredentials(id, inputUser));
     }
 
     @Override

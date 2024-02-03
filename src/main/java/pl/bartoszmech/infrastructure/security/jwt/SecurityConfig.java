@@ -62,7 +62,7 @@
                             auth -> auth
                                     .requestMatchers(WHITE_LIST_URL).permitAll()
                                     .requestMatchers(PATCH,"/api/tasks/{id}/complete").hasAnyAuthority(EMPLOYEE.getRoleName())
-                                        .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
+                                    .requestMatchers(GET,"/api/tasks/employee/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers(GET,"/api/tasks/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers("/api/tasks/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
                                     .requestMatchers("/api/users/stats/sorted-by-completed-tasks").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())

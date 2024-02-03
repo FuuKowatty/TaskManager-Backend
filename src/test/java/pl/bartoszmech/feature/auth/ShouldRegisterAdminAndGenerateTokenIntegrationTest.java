@@ -9,7 +9,6 @@ import pl.bartoszmech.IntegrationTest;
 import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
 import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
-import pl.bartoszmech.application.response.UserResponseDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
