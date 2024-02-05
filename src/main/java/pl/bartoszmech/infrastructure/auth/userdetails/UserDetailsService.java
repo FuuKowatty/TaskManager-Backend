@@ -1,11 +1,11 @@
 package pl.bartoszmech.infrastructure.auth.userdetails;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
+import pl.bartoszmech.infrastructure.auth.error.InvalidPasswordException;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     private final UserService userService;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws BadCredentialsException {
+    public UserDetails loadUserByUsername(String username) throws InvalidPasswordException {
         UserDto userDto = userService.findByEmail(username);
         return getUser(userDto);
     }

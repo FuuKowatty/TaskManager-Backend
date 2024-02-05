@@ -14,14 +14,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateUserDto;
 import pl.bartoszmech.application.request.UpdatePasswordRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.application.services.AuthorizationService;
 import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.service.UserService;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
-import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
+import pl.bartoszmech.infrastructure.auth.error.InvalidEmailException;
+import pl.bartoszmech.infrastructure.auth.error.InvalidPasswordException;
+import pl.bartoszmech.infrastructure.auth.error.UnauthorizedAccessException;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
@@ -42,7 +44,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "400", description = "Validation failed",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ValidationResponse.class)))
+                            schema = @Schema(implementation = ValidationResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid Email",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidEmailException.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid Password",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidPasswordException.class))),
     })
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
@@ -58,8 +66,8 @@ public class AuthController {
                             schema = @Schema(implementation = ValidationResponse.class)))
     })
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> registerAdmin(@Valid @RequestBody CreateAndUpdateUserRequestDto user) {
-        CreateAndUpdateUserRequestDto inputAdmin = UserMapper.mapToCreateAdminRequest(user);
+    public ResponseEntity<UserResponseDto> registerAdmin(@Valid @RequestBody CreateUserDto user) {
+        CreateUserDto inputAdmin = UserMapper.mapToCreateAdminRequest(user);
         return ResponseEntity.status(CREATED).body(userService.registerAdmin(inputAdmin));
     }
 
@@ -78,7 +86,7 @@ public class AuthController {
     @Operation(summary = "Change password")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Return message and success status"),
-            @ApiResponse(responseCode = "401", description = "Invalid token or password does not match",
+            @ApiResponse(responseCode = "403", description = "Invalid token or password does not match",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UnauthorizedAccessException.class))),
 
@@ -88,18 +96,6 @@ public class AuthController {
         authorizationService.checkIfPasswordMatch(passwords);
         userService.updatePassword(authorizationService.findAuthenticatedUser(), passwords);
         return ResponseEntity.status(OK).build();
-    }
-
-    @Operation(summary = "Change email")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Returned user data"),
-            @ApiResponse(responseCode = "401", description = "Invalid token",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UnauthorizedAccessException.class)))
-    })
-    @PatchMapping("/change-email")
-    public ResponseEntity<UserResponseDto> changeAccountEmail() {
-        return ResponseEntity.status(OK).body(authorizationService.findAuthenticatedUserWithoutPassword());
     }
 
 }

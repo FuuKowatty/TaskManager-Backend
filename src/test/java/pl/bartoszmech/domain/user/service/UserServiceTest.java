@@ -3,7 +3,8 @@ package pl.bartoszmech.domain.user.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateUserDto;
+import pl.bartoszmech.application.request.UpdateUserDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.EmailTakenException;
 import pl.bartoszmech.domain.user.UserRepositoryTestImpl;
@@ -32,7 +33,7 @@ public class UserServiceTest {
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
         //when
-        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateUserDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -55,7 +56,7 @@ public class UserServiceTest {
     public void should_throw_exception_if_email_is_already_used() {
         //given
         String email = "example@gmail.com";
-        userService.createUser(CreateAndUpdateUserRequestDto
+        userService.createUser(CreateUserDto
                         .builder()
                         .firstName("Dany")
                         .lastName("Abramov")
@@ -66,7 +67,7 @@ public class UserServiceTest {
         //when
         Throwable emailTaken = assertThrows(
                 EmailTakenException.class,
-                () -> userService.createUser(CreateAndUpdateUserRequestDto.builder()
+                () -> userService.createUser(CreateUserDto.builder()
                         .firstName("rifsif")
                         .lastName("KMduiroqr")
                         .email(email)
@@ -95,7 +96,7 @@ public class UserServiceTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateUserDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -118,7 +119,7 @@ public class UserServiceTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateUserDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -152,7 +153,7 @@ public class UserServiceTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateUserDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -187,7 +188,7 @@ public class UserServiceTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateUserDto
                 .builder()
                 .firstName("OtherNameThanDany")
                 .lastName("OtherSurnameThanDany")
@@ -197,11 +198,10 @@ public class UserServiceTest {
                 .build()
         );
         //when
-        UserResponseDto updatedUser = userService.updateUser(savedUser.id(), CreateAndUpdateUserRequestDto.builder()
+        UserResponseDto updatedUser = userService.updateUser(savedUser.id(), UpdateUserDto.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
-                .password(password)
                 .role(role)
                 .build());
         //then
@@ -218,14 +218,12 @@ public class UserServiceTest {
     public void should_throw_exception_if_client_provide_invalid_id_in_updateUser() {
         //given
         long id = 997L;
-        String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
         //when
-        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> userService.updateUser(id, CreateAndUpdateUserRequestDto.builder()
+        Throwable taskNotFound = assertThrows(ResourceNotFound.class, () -> userService.updateUser(id, UpdateUserDto.builder()
                 .firstName("OtherNameThanDany")
                 .lastName("OtherSurnameThanDany")
                 .email("qwe123@qwe123.pl")
-                .password(password)
                 .role(role)
                 .build()));
         //then
@@ -241,7 +239,7 @@ public class UserServiceTest {
         String email = "example@gmail.com";
         String password = "zaq1@WSX";
         UserRoles role = EMPLOYEE;
-        userService.createUser(CreateAndUpdateUserRequestDto
+        userService.createUser(CreateUserDto
                 .builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -250,7 +248,7 @@ public class UserServiceTest {
                 .role(role)
                 .build()
         );
-        UserResponseDto savedUser2 = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser2 = userService.createUser(CreateUserDto
                 .builder()
                 .firstName("Bartosz")
                 .lastName("Mech")
@@ -262,11 +260,10 @@ public class UserServiceTest {
         //when
         Throwable emailTaken = assertThrows(
                 EmailTakenException.class,
-                () -> userService.updateUser(savedUser2.id(), CreateAndUpdateUserRequestDto.builder()
+                () -> userService.updateUser(savedUser2.id(), UpdateUserDto.builder()
                         .firstName("rifsif")
                         .lastName("KMduiroqr")
                         .email(email)
-                        .password("123QWE@#!")
                         .role(MANAGER)
                         .build())
         );
@@ -281,7 +278,7 @@ public class UserServiceTest {
         //given
         String email = "example@gmail.com";
         String password = "XXXXXXXX";
-        UserResponseDto savedUser = userService.createUser(CreateAndUpdateUserRequestDto
+        UserResponseDto savedUser = userService.createUser(CreateUserDto
                 .builder()
                 .firstName("Dany")
                 .lastName("Abramov")
@@ -315,7 +312,7 @@ public class UserServiceTest {
         //given
         String email = "example@gmail.com";
         //when
-        UserResponseDto savedUser = userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
+        UserResponseDto savedUser = userService.registerAdmin(CreateUserDto.builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(email)
@@ -331,7 +328,7 @@ public class UserServiceTest {
         //given
         String email = "example@gmail.com";
         //when
-        UserResponseDto savedUser = userService.registerAdmin(CreateAndUpdateUserRequestDto.builder()
+        UserResponseDto savedUser = userService.registerAdmin(CreateUserDto.builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(email)
@@ -347,7 +344,7 @@ public class UserServiceTest {
     public void should_throw_email_is_existing_in_registerAdmin() {
         //given
         String email = "example@gmail.com";
-        userService.createUser(CreateAndUpdateUserRequestDto.builder()
+        userService.createUser(CreateUserDto.builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(email)
@@ -357,7 +354,7 @@ public class UserServiceTest {
         //when
         Throwable emailTaken = assertThrows(
                 EmailTakenException.class,
-                () -> userService.registerAdmin((CreateAndUpdateUserRequestDto.builder()
+                () -> userService.registerAdmin((CreateUserDto.builder()
                         .firstName("Dany")
                         .lastName("Abramov")
                         .email(email)

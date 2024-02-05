@@ -1,11 +1,8 @@
 package pl.bartoszmech.application.services;
 
-import jakarta.xml.bind.ValidationException;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.request.UpdatePasswordRequestDto;
 import pl.bartoszmech.application.response.UserResponseDto;
@@ -13,7 +10,7 @@ import pl.bartoszmech.domain.user.UserMapper;
 import pl.bartoszmech.domain.user.UserRoles;
 import pl.bartoszmech.domain.user.dto.UserDto;
 import pl.bartoszmech.domain.user.service.UserService;
-import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
+import pl.bartoszmech.infrastructure.auth.error.UnauthorizedAccessException;
 import pl.bartoszmech.infrastructure.auth.dto.JwtResponseDto;
 import pl.bartoszmech.infrastructure.security.jwt.JwtAuthenticatorService;
 
