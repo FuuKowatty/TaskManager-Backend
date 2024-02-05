@@ -18,6 +18,7 @@ import pl.bartoszmech.infrastructure.auth.error.InvalidPasswordException;
 
 import java.util.List;
 
+import static pl.bartoszmech.domain.user.UserRoles.ADMIN;
 import static pl.bartoszmech.domain.user.UserRoles.EMPLOYEE;
 
 @AllArgsConstructor
@@ -81,6 +82,7 @@ public class UserServiceImpl implements UserService {
                 .findAll()
                 .stream()
                 .map(UserMapper::mapToResponse)
+                .filter(user -> user.role() != ADMIN)
                 .toList();
     }
 
