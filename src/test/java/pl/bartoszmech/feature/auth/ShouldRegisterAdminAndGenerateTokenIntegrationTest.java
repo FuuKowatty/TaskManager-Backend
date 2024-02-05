@@ -6,7 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.bartoszmech.IntegrationTest;
-import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateUserDto;
 import pl.bartoszmech.application.request.TokenRequestDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
 
@@ -32,7 +32,7 @@ public class ShouldRegisterAdminAndGenerateTokenIntegrationTest {
         //given
         String adminEmail = "admin@gmail.com";
         String adminPassword = "zaq1@WSX";
-        CreateAndUpdateUserRequestDto user = CreateAndUpdateUserRequestDto.builder()
+        CreateUserDto user = CreateUserDto.builder()
                 .firstName("Dany")
                 .lastName("Abramov")
                 .email(adminEmail)

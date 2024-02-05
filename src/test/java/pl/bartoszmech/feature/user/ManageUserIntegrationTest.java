@@ -8,7 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.bartoszmech.IntegrationTest;
-import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateUserDto;
 import pl.bartoszmech.application.response.TokenResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.domain.user.dto.UserDto;
@@ -79,7 +79,7 @@ public class ManageUserIntegrationTest {
         //Step 1: Admin can create user
         Long createdUserId = objectMapper.readValue(mockMvc.perform(post("/api/users")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateUserDto.builder()
                                 .firstName("Dany")
                                 .lastName("Abramov")
                                 .email("r23d33t3@gmail.com")
@@ -98,7 +98,7 @@ public class ManageUserIntegrationTest {
         //Step 3: Admin can update user by id
         mockMvc.perform(put("/api/users/" + createdUserId)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateUserDto.builder()
                                 .firstName("Danny")
                                 .lastName("Daniels")
                                 .email("abc@gmail.com")
@@ -120,7 +120,7 @@ public class ManageUserIntegrationTest {
         //Step 1: Manager cant create user
         mockMvc.perform(post("/api/users")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateUserDto.builder()
                                 .firstName("Dany")
                                 .lastName("Abramov")
                                 .email("r23d33t3@gmail.com")
@@ -142,7 +142,7 @@ public class ManageUserIntegrationTest {
         //Step 4: Manager cant update user by id
         mockMvc.perform(put("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateUserDto.builder()
                                 .firstName("Danny")
                                 .lastName("Daniels")
                                 .email("manager@gmail.com")
@@ -163,7 +163,7 @@ public class ManageUserIntegrationTest {
         //Step 1: Employee cant create user
         mockMvc.perform(post("/api/users")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateUserDto.builder()
                                 .firstName("Dany")
                                 .lastName("Abramov")
                                 .email("r23d33t3@gmail.com")
@@ -185,7 +185,7 @@ public class ManageUserIntegrationTest {
         //Step 4: Employee cant update user by id
         mockMvc.perform(put("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(CreateAndUpdateUserRequestDto.builder()
+                        .content(objectMapper.writeValueAsString(CreateUserDto.builder()
                                 .firstName("Danny")
                                 .lastName("Daniels")
                                 .email("manager@gmail.com")

@@ -66,6 +66,7 @@
                                     .requestMatchers(GET,"/api/tasks/{id}").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName(), EMPLOYEE.getRoleName())
                                     .requestMatchers("/api/tasks/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
                                     .requestMatchers("/api/users/stats/sorted-by-completed-tasks").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
+                                    .requestMatchers(GET, "/api/users/**").hasAnyAuthority(ADMIN.getRoleName(), MANAGER.getRoleName())
                                     .requestMatchers("/api/users/**").hasAuthority(ADMIN.getRoleName())
                                     .anyRequest().authenticated()
                     )

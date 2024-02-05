@@ -24,7 +24,7 @@ import pl.bartoszmech.application.services.AuthorizationService;
 import pl.bartoszmech.application.response.TaskInfoResponseDto;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
-import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
+import pl.bartoszmech.infrastructure.auth.error.UnauthorizedAccessException;
 
 import javax.naming.AuthenticationException;
 import java.util.List;

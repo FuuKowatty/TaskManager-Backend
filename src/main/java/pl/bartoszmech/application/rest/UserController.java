@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bartoszmech.application.request.CreateAndUpdateUserRequestDto;
+import pl.bartoszmech.application.request.CreateUserDto;
+import pl.bartoszmech.application.request.UpdateUserDto;
 import pl.bartoszmech.application.response.CompletedTasksByAssignedToResponseDto;
-import pl.bartoszmech.application.response.TaskResponseDto;
 import pl.bartoszmech.application.response.UserResponseDto;
 import pl.bartoszmech.application.services.EmployeeAnalysisService;
 import pl.bartoszmech.domain.task.service.TaskService;
@@ -31,7 +30,7 @@ import pl.bartoszmech.application.services.AuthorizationService;
 import pl.bartoszmech.application.response.CompletedTasksStatisticResponseDto;
 import pl.bartoszmech.infrastructure.apivalidation.ResourceNotFound;
 import pl.bartoszmech.infrastructure.apivalidation.ValidationResponse;
-import pl.bartoszmech.infrastructure.auth.UnauthorizedAccessException;
+import pl.bartoszmech.infrastructure.auth.error.UnauthorizedAccessException;
 
 import javax.naming.AuthenticationException;
 import java.util.List;
@@ -91,7 +90,7 @@ public class UserController {
                             schema = @Schema(implementation = UnauthorizedAccessException.class))),
     })
     @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateUserDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(CREATED).body(userService.createUser(UserMapper.mapToCreateAndUpdateRequest(requestDto)));
     }
@@ -127,7 +126,7 @@ public class UserController {
                             schema = @Schema(implementation = ResourceNotFound.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody CreateAndUpdateUserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> editUserById(@PathVariable("id") long id, @Valid @RequestBody UpdateUserDto requestDto) {
         authorizationService.checkIfUserWantsCreateAdmin(requestDto.role());
         return ResponseEntity.status(OK).body(userService.updateUser(id, requestDto));
     }

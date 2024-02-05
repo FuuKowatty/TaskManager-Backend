@@ -8,7 +8,7 @@ import lombok.Builder;
 import pl.bartoszmech.domain.user.UserRoles;
 
 @Builder
-public record CreateAndUpdateUserRequestDto(
+public record CreateUserDto(
 
         @NotNull(message = "First name is required.")
         @NotBlank(message = "First name must not be blank.")
