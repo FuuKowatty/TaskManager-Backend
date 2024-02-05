@@ -129,15 +129,15 @@ public class ManageUserIntegrationTest {
                                 .build())))
                 .andExpect(status().isForbidden());
 
-        //Step 2: Manager cant get any other user by id
+        //Step 2: Manager can get other user by id
         mockMvc.perform(get("/api/users/1")
                         .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
 
-        //Step 3: Manager cant get all users
+        //Step 3: Manager can get all users
         mockMvc.perform(get("/api/users")
                         .contentType(APPLICATION_JSON_VALUE))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
 
         //Step 4: Manager cant update user by id
         mockMvc.perform(put("/api/users/1")
