@@ -7,8 +7,6 @@ All logic is based on two domains: user and task.
 
 The application is based on DDD (Domain Driven Design) with hexagonal architecture, so we have a clear direction between client scope, business logic and implementations.
 
-Checkout out swagger!: http://ec2-16-171-206-207.eu-north-1.compute.amazonaws.com:8000/swagger-ui/index.html
-
 ## Architecture
 ![Architecture](./architecture/architecture-v1.png)
 
